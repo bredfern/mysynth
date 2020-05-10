@@ -1,0 +1,31 @@
+<template>
+  <v-layout column justify-center align-center>
+    <v-flex xs12 sm8 md6>
+      <v-card>
+        <v-card-title class="headline">
+          Web Audio Synth
+        </v-card-title>
+        <v-card-text>
+          <p>
+           Welcome to the web audio synth using vue.
+          </p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <synth />
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
+</template>
+
+<script>
+import Synth from '~/components/Synth.vue'
+
+
+export default {
+  components: {
+    Synth
+  }
+}
+</script>

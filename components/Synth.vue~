@@ -1,0 +1,62 @@
+<template>
+  <div id="app">
+    <v-btn @click="synthStart">
+      start
+    </v-btn>
+    <v-btn @click="synthStop">
+      stop
+    </v-btn>
+  </div>
+</template>
+
+<script>
+import { MonoSynth } from 'tone'
+
+export default {
+  data () {
+    return {
+      clicked: 0
+    }
+  },
+  created () {
+    this.instrument = new MonoSynth({
+      oscillator: {
+        type: 'fmsquare',
+        modulationType: 'sawtooth',
+        modulationIndex: 3,
+        harmonicity: 3.4
+      },
+      envelope: {
+        attack: 0.001,
+        decay: 0.1,
+        sustain: 0.1,
+        release: 0.1
+      }
+    }).toMaster()
+  },
+  methods: {
+    synthStart () {
+      instrument.sync()
+      //schedule 3 notes when the transport first starts
+      instrument.triggerAttackRelease('C4', '8n', 0)
+      instrument.triggerAttackRelease('E4', '8n', '8n')
+      instrument.triggerAttackRelease('G4', '8n', '4n')
+      //start the transport to hear the notes
+      Transport.start()
+      //this.synth.triggerAttack('B5')
+    },
+    synthStop () {
+      this.synth.synth.triggerAttack("C4", "+0.5", 0.5)
+    }
+  }
+}
+</script>
+
+<style>
+button {
+  height: 180px;
+  width: 180px;
+  background: #011;
+  color: #fff;
+}
+</style>
