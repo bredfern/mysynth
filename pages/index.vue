@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text>
           <p>
-           
+            Your web audio synth.
           </p>
         </v-card-text>
         <v-card-actions>

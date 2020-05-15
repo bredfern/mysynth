@@ -1,36 +1,49 @@
 <template>
   <div id="app">
     <div>
-      Attack
-      <v-slider @mouseup="synthAttack()" v-model="sliderAttack" />{{slider}}
+      Attack {{ sliderAttack }}
+      <v-slider v-model="sliderAttack" />
     </div>
     <div>
-      Decay
-      <v-slider @moouseup="synthDecay()" v-model="sliderDecay" />{{slider}}
+      Decay {{ sliderDecay }}
+      <v-slider v-model="sliderDecay" />
     </div>
     <div>
-      Release
-      <v-slider @mouseup="synthRelease()" v-model="sliderRelease" />{{slider}}
+      Release {{ sliderRelease }}
+      <v-slider v-model="sliderRelease" />
     </div>
     <div>
-      Sustain
-      <v-slider @mouseup="synthSustain()" v-model="sliderSustain" />{{slider}}
+      Sustain {{ sliderSustain }}
+      <v-slider v-model="sliderSustain" />
     </div>
     <div>
-      <v-btn rounded color="primary" dark @click="synthStart(1)">1</v-btn>
-      <v-btn rounded color="primary" dark @click="synthStart(2)">2</v-btn>
-      <v-btn rounded color="primary" dark @click="synthStart(3)">3</v-btn>
-      <v-btn rounded color="primary" dark @click="synthStart(4)">4</v-btn>
-      <v-btn rounded color="primary" dark @click="synthStart(5)">5</v-btn>
-      <v-btn rounded color="primary" dark @click="synthStart(6)">6</v-btn>
-      <v-btn rounded color="primary" dark @click="synthStart(7)">7</v-btn>
+      <v-btn rounded large color="primary" dark @click="synthStart(1)">
+        1
+      </v-btn>
+      <v-btn rounded large color="primary" dark @click="synthStart(2)">
+        2
+      </v-btn>
+      <v-btn rounded large color="primary" dark @click="synthStart(3)">
+        3
+      </v-btn>
+      <v-btn rounded large color="primary" dark @click="synthStart(4)">
+        4
+      </v-btn>
+      <v-btn rounded large color="primary" dark @click="synthStart(5)">
+        5
+      </v-btn>
+      <v-btn rounded large color="primary" dark @click="synthStart(6)">
+        6
+      </v-btn>
+      <v-btn rounded large color="primary" dark @click="synthStart(7)">
+        7
+      </v-btn>
     </div>
   </div>
 </template>
 
 <script>
-import { PluckSynth } from 'tone'
-import { Freeverb } from 'tone'
+import { Synth, Freeverb } from 'tone'
 
 export default {
   data () {
@@ -45,7 +58,7 @@ export default {
   created () {
     const freeverb = new Freeverb().toMaster()
     freeverb.dampening.value = 1000
-    this.synth = new PluckSynth({
+    this.synth = new Synth({
       oscillator: {
         type: 'fmsquare',
         modulationType: 'sine',
@@ -60,26 +73,19 @@ export default {
       }
     }).connect(freeverb)
   },
+  mounted () {
+    window.addEventListener('keypress', (e) => {
+      const num = parseFloat(String.fromCharCode(e.keyCode))
+      if ((num > 0) && (num < 10)) {
+        this.synthStart(num)
+      }
+    })
+  },
   methods: {
     synthStart (num) {
       const noteNumber = num + 1
       const noteItem = `C${noteNumber}`
-      this.synth.triggerAttackRelease(noteItem, '8n')
-    },
-    synthAttack () {
-      this.synth.envelope.attack = this.sliderAttack * 0.01
-    },
-    synthDecay () {
-      this.synth.envelope.decay = this.sliderDecay * 0.01
-    },
-    synthRelease () {
-      this.synth.envelope.release = this.sliderRelease * 0.01
-    },
-    synthSustain () {
-      this.synth.envelope.sustain = this.sliderSustain * 0.01
-    },
-    test(where, e) {
-      console.log(`keyuptest at ${where} with code ${e.keyCode}`);
+      this.synth.triggerAttackRelease(noteItem, '4n')
     }
   }
 }
