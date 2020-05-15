@@ -3,11 +3,11 @@
     <v-flex xs12 sm8 md6>
       <v-card>
         <v-card-title class="headline">
-          Web Audio Synth
+          My Synth
         </v-card-title>
         <v-card-text>
           <p>
-            Welcome to the web audio synth using vue.
+           
           </p>
         </v-card-text>
         <v-card-actions>
