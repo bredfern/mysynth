@@ -17,53 +17,82 @@
       <v-slider v-model="sliderSustain" />
     </div>
     <div>
-      <v-btn rounded large color="primary" dark @click="synthStart(1)">
-        1
-      </v-btn>
-      <v-btn rounded large color="primary" dark @click="synthStart(2)">
-        2
-      </v-btn>
-      <v-btn rounded large color="primary" dark @click="synthStart(3)">
-        3
-      </v-btn>
-      <v-btn rounded large color="primary" dark @click="synthStart(4)">
-        4
-      </v-btn>
-      <v-btn rounded large color="primary" dark @click="synthStart(5)">
-        5
-      </v-btn>
-      <v-btn rounded large color="primary" dark @click="synthStart(6)">
-        6
-      </v-btn>
-      <v-btn rounded large color="primary" dark @click="synthStart(7)">
-        7
-      </v-btn>
+      FM Index {{ sliderIndex }}
+      <v-slider v-model="sliderIndex" />
     </div>
+    <div>
+      Transpose {{ noteNumber }}
+      <v-slider v-model="noteNumber" max="9" />
+    </div>
+    <span v-for="note in notes" :key="note.number">
+      <v-btn
+        tile
+        large
+        height="200"
+        :color="dynamicColor"
+        dark
+        @click="synthStart(note.name)"
+      >
+        {{ note.number }}
+      </v-btn>
+    </span>
   </div>
 </template>
 
 <script>
-import { Synth, Freeverb } from 'tone'
+import { Synth, PolySynth, Freeverb } from 'tone'
 
 export default {
   data () {
     return {
-      clicked: 1,
+      dynamicColor: 'primary',
       sliderAttack: 1,
       sliderRelease: 1,
       sliderDecay: 1,
-      sliderSustain: 1
+      sliderSustain: 1,
+      sliderIndex: 1,
+      noteNumber: 3,
+      notes: [
+        {
+          name: 'a',
+          number: 1
+        },
+        {
+          name: 'b',
+          number: 2
+        },
+        {
+          name: 'c',
+          number: 3
+        },
+        {
+          name: 'd',
+          number: 4
+        },
+        {
+          name: 'e',
+          number: 5
+        },
+        {
+          name: 'f',
+          number: 6
+        },
+        {
+          name: 'g',
+          number: 7
+        }
+      ]
     }
   },
   created () {
     const freeverb = new Freeverb().toMaster()
     freeverb.dampening.value = 1000
-    this.synth = new Synth({
+    this.synth = new PolySynth(6, Synth, {
       oscillator: {
-        type: 'fmsquare',
-        modulationType: 'sine',
-        modulationIndex: 1,
-        harmonicity: 0.1
+        type: 'fmtriangle',
+        modulationType: 'square',
+        modulationIndex: this.sliderIndex,
+        harmonicity: Math.floor((Math.random() * 10) + 1) * 0.1
       },
       envelope: {
         attack: this.sliderAttack,
@@ -75,18 +104,22 @@ export default {
   },
   mounted () {
     window.addEventListener('keypress', (e) => {
-      const num = parseFloat(String.fromCharCode(e.keyCode))
-      if ((num > 0) && (num < 10)) {
-        this.synthStart(num)
+      const num = parseFloat(String.fromCharCode(e.keyCode) - 1)
+      if ((num >= 0) && (num < this.notes.length)) {
+        this.synthStart(this.notes[num].name)
       }
     })
   },
   methods: {
     synthStart (num) {
-      const noteNumber = num + 1
-      const noteItem = `C${noteNumber}`
+      const noteItem = `${num}${this.noteNumber}`
       this.synth.triggerAttackRelease(noteItem, '4n')
     }
   }
 }
 </script>
+<style scoped>
+  .key {
+    height: 200px;
+  }
+</style>

@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text>
           <p>
-            Your web audio synth.
+            Click the buttons below or on a computer type the numbers 1-7 to make sounds.
           </p>
         </v-card-text>
         <v-card-actions>
