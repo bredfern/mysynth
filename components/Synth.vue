@@ -22,14 +22,15 @@
     </div>
     <div>
       Transpose {{ noteNumber }}
-      <v-slider v-model="noteNumber" max="9" />
+      <v-slider v-model="noteNumber" max="18" />
     </div>
     <span v-for="note in notes" :key="note.number">
       <v-btn
+        ref="note.number"
         tile
         large
+        color="blue"
         height="200"
-        :color="dynamicColor"
         dark
         @click="synthStart(note.name)"
       >
@@ -46,12 +47,14 @@ export default {
   data () {
     return {
       dynamicColor: 'primary',
+      whiteColor: 'white',
+      blueColor: 'blue',
       sliderAttack: 1,
       sliderRelease: 1,
       sliderDecay: 1,
       sliderSustain: 1,
       sliderIndex: 1,
-      noteNumber: 3,
+      noteNumber: 6,
       notes: [
         {
           name: 'a',
@@ -118,8 +121,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-  .key {
-    height: 200px;
-  }
-</style>
