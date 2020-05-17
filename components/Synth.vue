@@ -29,7 +29,7 @@
         ref="note.number"
         tile
         large
-        color="blue"
+        :color="note.color"
         height="200"
         dark
         @click="synthStart(note.name)"
@@ -46,43 +46,97 @@ import { Synth, PolySynth, Freeverb } from 'tone'
 export default {
   data () {
     return {
-      dynamicColor: 'primary',
-      whiteColor: 'white',
-      blueColor: 'blue',
-      sliderAttack: 1,
+      sliderAttack: 0,
       sliderRelease: 1,
       sliderDecay: 1,
       sliderSustain: 1,
-      sliderIndex: 1,
-      noteNumber: 6,
+      sliderIndex: 1.8,
+      noteNumber: 7,
       notes: [
         {
           name: 'a',
-          number: 1
+          number: 1,
+          color: 'blue'
+        },
+        {
+          name: 'a#',
+          number: 2,
+          color: 'blue'
         },
         {
           name: 'b',
-          number: 2
+          number: 3,
+          color: 'blue'
         },
         {
           name: 'c',
-          number: 3
+          number: 4,
+          color: 'blue'
+        },
+        {
+          name: 'c#',
+          number: 5,
+          color: 'blue'
         },
         {
           name: 'd',
-          number: 4
+          number: 6,
+          color: 'blue'
+        },
+        {
+          name: 'd#',
+          number: 7,
+          color: 'blue'
         },
         {
           name: 'e',
-          number: 5
+          number: 8,
+          color: 'blue'
         },
         {
           name: 'f',
-          number: 6
+          number: 9,
+          color: 'blue'
+        },
+        {
+          name: 'f#',
+          number: 10,
+          color: 'blue'
         },
         {
           name: 'g',
-          number: 7
+          number: 11,
+          color: 'blue'
+        },
+        {
+          name: 'g#',
+          number: 11,
+          color: 'blue'
+        },
+        {
+          name: 'a',
+          number: 12,
+          color: 'blue'
+        },
+        {
+          name: 'a#',
+          number: 13,
+          color: 'blue'
+        },
+        {
+          name: 'b',
+          number: 14,
+          color: 'blue'
+        },
+        {
+          name: 'c',
+          number: 15,
+          color: 'blue'
+        },
+        {
+          name: 'c#',
+          number: 16,
+          color: 'blue'
         }
       ]
     }
@@ -90,10 +144,10 @@ export default {
   created () {
     const freeverb = new Freeverb().toMaster()
     freeverb.dampening.value = 1000
-    this.synth = new PolySynth(6, Synth, {
+    this.synth = new PolySynth(4, Synth, {
       oscillator: {
-        type: 'fmtriangle',
-        modulationType: 'square',
+        type: 'fmsquare',
+        modulationType: 'sine',
         modulationIndex: this.sliderIndex,
         harmonicity: Math.floor((Math.random() * 10) + 1) * 0.1
       },
@@ -107,16 +161,30 @@ export default {
   },
   mounted () {
     window.addEventListener('keypress', (e) => {
-      const num = parseFloat(String.fromCharCode(e.keyCode) - 1)
-      if ((num >= 0) && (num < this.notes.length)) {
-        this.synthStart(this.notes[num].name)
-      }
+      const press = true
+      this.keyPlay(e, press)
+    })
+
+    window.addEventListener('keyup', (e) => {
+      const press = false
+      this.keyPlay(e, press)
     })
   },
   methods: {
     synthStart (num) {
       const noteItem = `${num}${this.noteNumber}`
       this.synth.triggerAttackRelease(noteItem, '4n')
+    },
+    keyPlay (e, press) {
+      const num = parseFloat(String.fromCharCode(e.keyCode) - 1)
+      if ((num >= 0) && (num < this.notes.length)) {
+        if (press === true) {
+          this.notes[num].color = 'white'
+          this.synthStart(this.notes[num].name)
+        } else {
+          this.notes[num].color = 'blue'
+        }
+      }
     }
   }
 }
