@@ -1,47 +1,102 @@
 <template>
   <div id="app">
-    <div>
-      Attack {{ sliderAttack }}
-      <v-slider v-model="sliderAttack" />
-    </div>
-    <div>
-      Decay {{ sliderDecay }}
-      <v-slider v-model="sliderDecay" />
-    </div>
-    <div>
-      Release {{ sliderRelease }}
-      <v-slider v-model="sliderRelease" />
-    </div>
-    <div>
-      Sustain {{ sliderSustain }}
-      <v-slider v-model="sliderSustain" />
-    </div>
-    <div>
-      FM Index {{ sliderIndex }}
-      <v-slider v-model="sliderIndex" />
-    </div>
-    <div>
-      Transpose {{ noteNumber }}
-      <v-slider v-model="noteNumber" max="18" />
-    </div>
-    <span v-for="note in notes" :key="note.number">
-      <v-btn
-        ref="note.number"
-        tile
-        large
-        :color="note.color"
-        height="200"
-        dark
-        @click="synthStart(note.name)"
-      >
-        {{ note.number }}
-      </v-btn>
-    </span>
+    <v-container>
+      <v-row no-gutters>
+        <v-col>
+          <v-card
+            class="ma-3 pa-6"
+            outlined
+            center
+            tile
+          >
+            <v-slider v-model="sliderAttack" vertical />
+            A <br> {{ sliderAttack }}
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card
+            class="ma-3 pa-6"
+            outlined
+            tile
+          >
+            <v-slider v-model="sliderDecay" vertical />
+            D {{ sliderDecay }}
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card
+            class="ma-3 pa-6"
+            outlined
+            tile
+          >
+            <v-slider v-model="sliderRelease" vertical />
+            R {{ sliderRelease }}
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card
+            class="ma-3 pa-6"
+            outlined
+            tile
+          >
+            <v-slider v-model="sliderSustain" vertical />
+            S {{ sliderSustain }}
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card
+            class="ma-3 pa-6"
+            outlined
+            tile
+          >
+            <v-slider v-model="sliderIndex" vertical />
+            I {{ sliderIndex }}
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card
+            class="ma-3 pa-6"
+            outlined
+            tile
+          >
+            <v-slider v-model="noteNumber" vertical />
+            T {{ noteNumber }}
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card
+            class="ma-3 pa-6"
+            outlined
+            tile
+          >
+            <v-slider v-model="volumeNumber" vertical />
+            V {{ volumeNumber }}
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <span v-for="note in notes" :key="note.number">
+            <v-btn
+              ref="note.number"
+              tile
+              large
+              :color="note.color"
+              height="200"
+              dark
+              @click="synthStart(note.name)"
+            >
+              {{ note.number }}
+            </v-btn>
+          </span>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
 <script>
-import { Synth, PolySynth, Freeverb } from 'tone'
+import { Synth, PolySynth, Freeverb, Volume } from 'tone'
 
 export default {
   data () {
@@ -52,96 +107,53 @@ export default {
       sliderSustain: 1,
       sliderIndex: 1.8,
       noteNumber: 7,
+      volumeNumber: 10,
       notes: [
         {
-          name: 'a',
+          name: 'c',
           number: 1,
           color: 'blue'
         },
         {
-          name: 'a#',
+          name: 'c#',
           number: 2,
-          color: 'blue'
+          color: 'red'
         },
         {
-          name: 'b',
+          name: 'd',
           number: 3,
           color: 'blue'
         },
         {
-          name: 'c',
+          name: 'd#',
           number: 4,
-          color: 'blue'
+          color: 'red'
         },
         {
-          name: 'c#',
+          name: 'e',
           number: 5,
           color: 'blue'
         },
         {
-          name: 'd',
+          name: 'f',
           number: 6,
           color: 'blue'
         },
         {
           name: 'd#',
           number: 7,
-          color: 'blue'
+          color: 'red'
         },
         {
           name: 'e',
           number: 8,
-          color: 'blue'
-        },
-        {
-          name: 'f',
-          number: 9,
-          color: 'blue'
-        },
-        {
-          name: 'f#',
-          number: 10,
-          color: 'blue'
-        },
-        {
-          name: 'g',
-          number: 11,
-          color: 'blue'
-        },
-        {
-          name: 'g#',
-          number: 11,
-          color: 'blue'
-        },
-        {
-          name: 'a',
-          number: 12,
-          color: 'blue'
-        },
-        {
-          name: 'a#',
-          number: 13,
-          color: 'blue'
-        },
-        {
-          name: 'b',
-          number: 14,
-          color: 'blue'
-        },
-        {
-          name: 'c',
-          number: 15,
-          color: 'blue'
-        },
-        {
-          name: 'c#',
-          number: 16,
           color: 'blue'
         }
       ]
     }
   },
   created () {
+    const vol = new Volume(this.volumeNumber)
     const freeverb = new Freeverb().toMaster()
     freeverb.dampening.value = 1000
     this.synth = new PolySynth(4, Synth, {
@@ -157,7 +169,7 @@ export default {
         sustain: this.sliderSustain,
         release: this.sliderRelease
       }
-    }).connect(freeverb)
+    }).chain(freeverb, vol)
   },
   mounted () {
     window.addEventListener('keypress', (e) => {
