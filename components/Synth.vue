@@ -10,7 +10,7 @@
             tile
           >
             <v-slider v-model="sliderAttack" vertical />
-            A <br> {{ sliderAttack }}
+            A <br>{{ sliderAttack }}
           </v-card>
         </v-col>
         <v-col>
@@ -20,7 +20,7 @@
             tile
           >
             <v-slider v-model="sliderDecay" vertical />
-            D {{ sliderDecay }}
+            D <br>{{ sliderDecay }}
           </v-card>
         </v-col>
         <v-col>
@@ -30,7 +30,7 @@
             tile
           >
             <v-slider v-model="sliderRelease" vertical />
-            R {{ sliderRelease }}
+            R <br>{{ sliderRelease }}
           </v-card>
         </v-col>
         <v-col>
@@ -40,7 +40,7 @@
             tile
           >
             <v-slider v-model="sliderSustain" vertical />
-            S {{ sliderSustain }}
+            S<br> {{ sliderSustain }}
           </v-card>
         </v-col>
         <v-col>
@@ -50,7 +50,7 @@
             tile
           >
             <v-slider v-model="sliderIndex" vertical />
-            I {{ sliderIndex }}
+            F<br> {{ sliderIndex }}
           </v-card>
         </v-col>
         <v-col>
@@ -60,7 +60,7 @@
             tile
           >
             <v-slider v-model="noteNumber" vertical />
-            T {{ noteNumber }}
+            T<br> {{ noteNumber }}
           </v-card>
         </v-col>
         <v-col>
@@ -70,7 +70,7 @@
             tile
           >
             <v-slider v-model="volumeNumber" vertical />
-            V {{ volumeNumber }}
+            V<br> {{ volumeNumber }}
           </v-card>
         </v-col>
       </v-row>
@@ -169,7 +169,7 @@ export default {
         sustain: this.sliderSustain,
         release: this.sliderRelease
       }
-    }).chain(freeverb, vol)
+    }).chain(freeverb, vol).toMaster()
   },
   mounted () {
     window.addEventListener('keypress', (e) => {
@@ -193,6 +193,8 @@ export default {
         if (press === true) {
           this.notes[num].color = 'white'
           this.synthStart(this.notes[num].name)
+        } else if ((this.notes[num].name.includes('#')) && (press === false)) {
+          this.notes[num].color = 'red'
         } else {
           this.notes[num].color = 'blue'
         }
