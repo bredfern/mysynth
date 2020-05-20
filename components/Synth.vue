@@ -1,98 +1,91 @@
 <template>
-  <div id="app">
-    <v-container>
-      <v-row no-gutters>
-        <v-col>
-          <v-card
-            class="ma-3 pa-6"
-            outlined
-            center
-            tile
-          >
-            <v-slider v-model="sliderAttack" vertical />
-            A <br>{{ sliderAttack }}
-          </v-card>
-        </v-col>
-        <v-col>
-          <v-card
-            class="ma-3 pa-6"
-            outlined
-            tile
-          >
-            <v-slider v-model="sliderDecay" vertical />
-            D <br>{{ sliderDecay }}
-          </v-card>
-        </v-col>
-        <v-col>
-          <v-card
-            class="ma-3 pa-6"
-            outlined
-            tile
-          >
-            <v-slider v-model="sliderRelease" vertical />
-            R <br>{{ sliderRelease }}
-          </v-card>
-        </v-col>
-        <v-col>
-          <v-card
-            class="ma-3 pa-6"
-            outlined
-            tile
-          >
-            <v-slider v-model="sliderSustain" vertical />
-            S<br> {{ sliderSustain }}
-          </v-card>
-        </v-col>
-        <v-col>
-          <v-card
-            class="ma-3 pa-6"
-            outlined
-            tile
-          >
-            <v-slider v-model="sliderIndex" vertical />
-            F<br> {{ sliderIndex }}
-          </v-card>
-        </v-col>
-        <v-col>
-          <v-card
-            class="ma-3 pa-6"
-            outlined
-            tile
-          >
-            <v-slider v-model="noteNumber" vertical />
-            T<br> {{ noteNumber }}
-          </v-card>
-        </v-col>
-        <v-col>
-          <v-card
-            class="ma-3 pa-6"
-            outlined
-            tile
-          >
-            <v-slider v-model="volumeNumber" vertical />
-            V<br> {{ volumeNumber }}
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <span v-for="note in notes" :key="note.number">
-            <v-btn
-              ref="note.number"
-              tile
-              large
-              :color="note.color"
-              height="200"
-              dark
-              @click="synthStart(note.name)"
-            >
-              {{ note.number }}
-            </v-btn>
-          </span>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
+  <v-container fluid>
+    <v-row dense>
+      <v-col cols="2">
+        <v-card
+          class="ma-3 pa-5"
+          outlined
+          center
+          tile
+        >
+          <v-slider v-model="sliderAttack" vertical />
+          A <br>{{ sliderAttack }}
+        </v-card>
+      </v-col>
+      <v-col cols="2">
+        <v-card
+          class="ma-3 pa-5"
+          outlined
+          tile
+        >
+          <v-slider v-model="sliderDecay" vertical />
+          D <br>{{ sliderDecay }}
+        </v-card>
+      </v-col>
+      <v-col cols="2">
+        <v-card
+          class="ma-3 pa-6"
+          outlined
+          tile
+        >
+          <v-slider v-model="sliderRelease" vertical />
+          R <br>{{ sliderRelease }}
+        </v-card>
+      </v-col>
+      <v-col cols="2">
+        <v-card
+          class="ma-3 pa-6"
+          outlined
+          tile
+        >
+          <v-slider v-model="sliderSustain" vertical />
+          S<br> {{ sliderSustain }}
+        </v-card>
+      </v-col>
+      <v-col cols="2">
+        <v-card
+          class="ma-3 pa-6"
+          outlined
+          tile
+        >
+          <v-slider v-model="sliderIndex" vertical />
+          F<br> {{ sliderIndex }}
+        </v-card>
+      </v-col>
+      <v-col cols="2">
+        <v-card
+          class="ma-3 pa-6"
+          outlined
+          tile
+        >
+          <v-slider v-model="noteNumber" vertical />
+          T<br> {{ noteNumber }}
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row
+      class="mb-3"
+      dense
+    >
+      <v-col
+        v-for="note in notes"
+        :key="note.number"
+        cols="1"
+        class="pa-2"
+      >
+        <v-btn
+          ref="note.number"
+          :color="note.color"
+          height="100"
+          dark
+          x-small
+          @click="synthStart(note.name)"
+        >
+          {{ note.number }}
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -140,25 +133,45 @@ export default {
           color: 'blue'
         },
         {
-          name: 'd#',
+          name: 'f#',
           number: 7,
           color: 'red'
         },
         {
-          name: 'e',
+          name: 'g',
           number: 8,
+          color: 'blue'
+        },
+        {
+          name: 'g#',
+          number: 9,
+          color: 'red'
+        },
+        {
+          name: 'a',
+          number: 10,
+          color: 'blue'
+        },
+        {
+          name: 'a#',
+          number: 11,
+          color: 'red'
+        },
+        {
+          name: 'b',
+          number: 12,
           color: 'blue'
         }
       ]
     }
   },
   created () {
-    const vol = new Volume(this.volumeNumber)
+    const vol = new Volume(10)
     const freeverb = new Freeverb().toMaster()
     freeverb.dampening.value = 1000
     this.synth = new PolySynth(4, Synth, {
       oscillator: {
-        type: 'fmsquare',
+        type: 'fmsine',
         modulationType: 'sine',
         modulationIndex: this.sliderIndex,
         harmonicity: Math.floor((Math.random() * 10) + 1) * 0.1
@@ -193,7 +206,7 @@ export default {
         if (press === true) {
           this.notes[num].color = 'white'
           this.synthStart(this.notes[num].name)
-        } else if ((this.notes[num].name.includes('#')) && (press === false)) {
+        } else if (this.notes[num].name.includes('#')) {
           this.notes[num].color = 'red'
         } else {
           this.notes[num].color = 'blue'
