@@ -17,9 +17,9 @@
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/pwa": "^3.0.0-0",
     "@tonejs/midi": "^2.0.23",
-    "mpe": "^1.0.4",
     "nuxt": "^2.0.0",
-    "tone": "^13.8.25"
+    "tone": "^13.8.25",
+    "webmidi": "^2.5.1"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^2.0.0",
