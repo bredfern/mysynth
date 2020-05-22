@@ -48,7 +48,7 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderIndex" vertical />
+          <v-slider v-model="sliderIndex" vertical max="10" />
           F<br> {{ sliderIndex }}
         </v-card>
       </v-col>
@@ -58,7 +58,7 @@
           outlined
           tile
         >
-          <v-slider v-model="noteNumber" vertical />
+          <v-slider v-model="noteNumber" vertical max="20" />
           T<br> {{ noteNumber }}
         </v-card>
       </v-col>
@@ -89,7 +89,8 @@
 </template>
 
 <script>
-import { Synth, PolySynth, Freeverb, Volume } from 'tone'
+import { Synth, PolySynth } from 'tone'
+import WebMidi from 'webmidi'
 
 export default {
   data () {
@@ -100,7 +101,6 @@ export default {
       sliderSustain: 1,
       sliderIndex: 1.8,
       noteNumber: 7,
-      volumeNumber: 10,
       notes: [
         {
           name: 'c',
@@ -166,13 +166,10 @@ export default {
     }
   },
   created () {
-    const vol = new Volume(10)
-    const freeverb = new Freeverb().toMaster()
-    freeverb.dampening.value = 1000
-    this.synth = new PolySynth(4, Synth, {
+    this.synth = new PolySynth(8, Synth, {
       oscillator: {
-        type: 'fmsine',
-        modulationType: 'sine',
+        type: 'fmsquare',
+        modulationType: 'sawtooth',
         modulationIndex: this.sliderIndex,
         harmonicity: Math.floor((Math.random() * 10) + 1) * 0.1
       },
@@ -182,7 +179,7 @@ export default {
         sustain: this.sliderSustain,
         release: this.sliderRelease
       }
-    }).chain(freeverb, vol).toMaster()
+    }).toMaster()
   },
   mounted () {
     window.addEventListener('keypress', (e) => {

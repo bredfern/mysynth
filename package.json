@@ -1,7 +1,7 @@
 {
   "name": "mysynth",
   "version": "1.0.0",
-  "description": "My bedazzling Nuxt.js project",
+  "description": "My web audio synth a work in progress",
   "author": "Brian Redfern",
   "private": true,
   "scripts": {
