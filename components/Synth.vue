@@ -74,10 +74,9 @@
         class="pa-2"
       >
         <v-btn
-          ref="note.number"
           :color="note.color"
           height="100"
-          dark
+          :name="note.number"
           x-small
           @click="synthStart(note.name)"
         >
