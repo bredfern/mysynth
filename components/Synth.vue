@@ -9,7 +9,7 @@
           tile
         >
           <v-slider v-model="sliderAttack" vertical />
-          A <br>{{ sliderAttack }}
+          {{ sliderAttack }}
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -19,7 +19,7 @@
           tile
         >
           <v-slider v-model="sliderDecay" vertical />
-          D <br>{{ sliderDecay }}
+          {{ sliderDecay }}
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -29,7 +29,7 @@
           tile
         >
           <v-slider v-model="sliderRelease" vertical />
-          R <br>{{ sliderRelease }}
+          {{ sliderRelease }}
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -39,7 +39,7 @@
           tile
         >
           <v-slider v-model="sliderSustain" vertical />
-          S<br> {{ sliderSustain }}
+          {{ sliderSustain }}
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -49,7 +49,7 @@
           tile
         >
           <v-slider v-model="sliderIndex" vertical max="10" />
-          F<br> {{ sliderIndex }}
+          {{ sliderIndex }}
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -58,8 +58,8 @@
           outlined
           tile
         >
-          <v-slider v-model="noteNumber" vertical max="20" />
-          T<br> {{ noteNumber }}
+          <v-slider v-model="noteNumber" vertical max="10" />
+          {{ noteNumber }}
         </v-card>
       </v-col>
     </v-row>
@@ -90,7 +90,6 @@
 
 <script>
 import { Synth, PolySynth } from 'tone'
-import WebMidi from 'webmidi'
 
 export default {
   data () {
@@ -99,8 +98,8 @@ export default {
       sliderRelease: 1,
       sliderDecay: 1,
       sliderSustain: 1,
-      sliderIndex: 1.8,
-      noteNumber: 7,
+      sliderIndex: 6,
+      noteNumber: 6,
       notes: [
         {
           name: 'c',
@@ -191,8 +190,28 @@ export default {
       const press = false
       this.keyPlay(e, press)
     })
+
+    if (navigator.requestMIDIAccess) {
+      navigator.requestMIDIAccess({
+        sysex: true
+      }).then(this.onMIDISuccess, this.onMIDIFailure)
+    } else {
+      alert('No MIDI support in your browser.')
+    }
   },
   methods: {
+    onMIDISuccess (midiAccess) {
+      const inputs = midiAccess.inputs.values()
+      for (let input = inputs.next(); input && !input.done; input = inputs.next()) {
+        input.value.onmidimessage = this.onMIDIMessage
+      }
+    },
+    onMIDIFailure (e) {
+      console.log(`No access to MIDI devices or your browser has no WebMIDI support. ${e.toString()}`)
+    },
+    onMIDIMessage (message) {
+      this.synthStart(message.data[1] * 0.8)
+    },
     synthStart (num) {
       const noteItem = `${num}${this.noteNumber}`
       this.synth.triggerAttackRelease(noteItem, '4n')
