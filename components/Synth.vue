@@ -63,21 +63,19 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-row
-      class="mb-3"
-      dense
-    >
+    <v-row>
       <v-col
         v-for="note in notes"
         :key="note.number"
-        cols="1"
-        class="pa-2"
+        cols="2"
+        sm="2"
+        lg="1"
       >
         <v-btn
           :color="note.color"
           height="100"
           :name="note.number"
-          x-small
+          small
           @click="synthStart(note.name)"
         >
           {{ note.number }}
@@ -98,7 +96,7 @@ export default {
       sliderDecay: 1,
       sliderSustain: 1,
       sliderIndex: 6,
-      noteNumber: 6,
+      noteNumber: 3,
       notes: [
         {
           name: 'c',
