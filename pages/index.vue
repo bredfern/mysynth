@@ -4,7 +4,7 @@
       <v-flex xs12 sm8 md6>
         <v-card>
           <v-card-title class="headline">
-            My Synth
+            My Synth by Jack Nice
           </v-card-title>
           <v-card-text>
             Click the buttons below or on a computer type the numbers 1-7 to make sounds. If you're using a compatible browser you can use webmidi to connect a keyboard controller to play.
