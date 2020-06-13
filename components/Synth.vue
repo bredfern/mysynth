@@ -3,7 +3,7 @@
     <v-row dense>
       <v-col cols="2">
         <v-card
-          class="ma-3 pa-5"
+          class="ma-2 pa-4"
           outlined
           center
           tile
@@ -14,7 +14,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-3 pa-5"
+          class="ma-2 pa-4"
           outlined
           tile
         >
@@ -24,7 +24,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-3 pa-6"
+          class="ma-2 pa-4"
           outlined
           tile
         >
@@ -34,7 +34,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-3 pa-6"
+          class="ma-2 pa-4"
           outlined
           tile
         >
@@ -44,7 +44,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-3 pa-6"
+          class="ma-2 pa-6"
           outlined
           tile
         >
@@ -54,7 +54,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-3 pa-6"
+          class="ma-2 pa-6"
           outlined
           tile
         >
@@ -67,15 +67,14 @@
       <v-col
         v-for="note in notes"
         :key="note.number"
-        cols="2"
-        sm="2"
-        lg="1"
+        cols="3"
+        class="col-sm-2"
       >
         <v-btn
           :color="note.color"
           height="100"
           :name="note.number"
-          small
+          large
           @click="synthStart(note.name)"
         >
           {{ note.number }}
