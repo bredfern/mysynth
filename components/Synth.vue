@@ -48,7 +48,7 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderIndex" vertical max="10" />
+          <v-slider v-model="sliderIndex" vertical max="200" />
           {{ sliderIndex }}
         </v-card>
       </v-col>
@@ -86,17 +86,17 @@
 </template>
 
 <script>
-import { Synth, PolySynth } from 'tone'
+import { FMSynth } from 'tone'
 
 export default {
   data () {
     return {
       sliderAttack: 0,
-      sliderRelease: 1,
-      sliderDecay: 1,
-      sliderSustain: 1,
+      sliderRelease: 10,
+      sliderDecay: 10,
+      sliderSustain: 10,
       sliderIndex: 6,
-      noteNumber: 3,
+      noteNumber: 30,
       notes: [
         {
           name: 'c',
@@ -162,18 +162,27 @@ export default {
     }
   },
   created () {
-    this.synth = new PolySynth(8, Synth, {
+    this.synth = new FMSynth({
+      harmonicity: this.noteNumber,
+      modulationIndex: this.sliderIndex,
+      detune: 0,
       oscillator: {
-        type: 'fmsquare',
-        modulationType: 'sawtooth',
-        modulationIndex: this.sliderIndex,
-        harmonicity: Math.floor((Math.random() * 10) + 1) * 0.1
+        type: 'sine'
       },
       envelope: {
         attack: this.sliderAttack,
         decay: this.sliderDecay,
         sustain: this.sliderSustain,
         release: this.sliderRelease
+      },
+      modulation: {
+        type: 'square'
+      },
+      modulationEnvelope: {
+        attack: 0.5 * this.sliderAttack,
+        decay: 0.5 * this.sliderDecay,
+        sustain: 0.5 * this.sliderSustain,
+        release: 0.5 * this.sliderRelease
       }
     }).toMaster()
   },
@@ -204,7 +213,7 @@ export default {
       }
     },
     onMIDIFailure (e) {
-      console.log(`No access to MIDI devices or your browser has no WebMIDI support. ${e.toString()}`)
+      alert(e)
     },
     onMIDIMessage (message) {
       this.synthStart(message.data[1] * 0.8)
