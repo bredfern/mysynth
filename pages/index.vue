@@ -7,7 +7,8 @@
             My Synth
           </v-card-title>
           <v-card-text>
-            Click the buttons below or on a computer type the numbers 1-7 to make sounds. If you're using a compatible browser you can use webmidi to connect a keyboard controller to play.
+            <p>Click the buttons below or on a computer type the numbers 1-9 to make sounds.</p>
+	    <p>If you're using a compatible browser you can use webmidi to connect a midi controller to play.</p>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
