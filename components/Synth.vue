@@ -96,7 +96,7 @@ export default {
       sliderDecay: 10,
       sliderSustain: 10,
       sliderIndex: 6,
-      noteNumber: 30,
+      noteNumber: 3,
       notes: [
         {
           name: 'c',
