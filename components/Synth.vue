@@ -48,7 +48,7 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderIndex" vertical max="200" />
+          <v-slider v-model="sliderIndex" vertical max="1000" />
           {{ sliderIndex }}
         </v-card>
       </v-col>
@@ -68,7 +68,7 @@
         v-for="note in notes"
         :key="note.number"
         cols="3"
-        class="col-sm-2"
+        class="col-sm-2 col-md-2 col-lg-1"
       >
         <v-btn
           :color="note.color"
@@ -164,7 +164,7 @@ export default {
     this.synth = new FMSynth({
       harmonicity: this.noteNumber,
       modulationIndex: this.sliderIndex,
-      detune: 0,
+      detune: this.sliderSustain,
       oscillator: {
         type: 'sine'
       },

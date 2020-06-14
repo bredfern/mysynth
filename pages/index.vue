@@ -8,7 +8,7 @@
           </v-card-title>
           <v-card-text>
             <p>Click the buttons below or on a computer type the numbers 1-9 to make sounds.</p>
-	    <p>If your browser can use webmidi you can connect a midi controller to play.</p>
+            <p>If your browser can use webmidi you can connect a midi controller to play.</p>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
