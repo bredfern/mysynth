@@ -8,8 +8,8 @@
           center
           tile
         >
-          <v-slider v-model="sliderAttack" vertical />
-          {{ sliderAttack }}
+          <v-slider v-model="sliderAttack" thumb-label vertical />
+          A
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -18,8 +18,8 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderDecay" vertical />
-          {{ sliderDecay }}
+          <v-slider v-model="sliderDecay" thumb-label vertical />
+          S
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -28,8 +28,8 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderRelease" vertical />
-          {{ sliderRelease }}
+          <v-slider v-model="sliderRelease" thumb-label vertical />
+          D
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -38,8 +38,8 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderSustain" vertical />
-          {{ sliderSustain }}
+          <v-slider v-model="sliderSustain" thumb-label vertical />
+          R
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -48,8 +48,8 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderIndex" vertical max="1000" />
-          {{ sliderIndex }}
+          <v-slider v-model="sliderIndex" vertical thumb-label max="1000" />
+          I
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -58,8 +58,8 @@
           outlined
           tile
         >
-          <v-slider v-model="noteNumber" vertical max="10" />
-          {{ noteNumber }}
+          <v-slider v-model="noteNumber" vertical thumb-label max="10" />
+          N
         </v-card>
       </v-col>
     </v-row>
@@ -91,9 +91,9 @@ export default {
   data () {
     return {
       sliderAttack: 0,
-      sliderRelease: 10,
-      sliderDecay: 10,
-      sliderSustain: 10,
+      sliderRelease: 60,
+      sliderDecay: 60,
+      sliderSustain: 60,
       sliderIndex: 6,
       noteNumber: 2,
       notes: [
