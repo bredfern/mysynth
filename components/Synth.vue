@@ -3,7 +3,7 @@
     <v-row dense>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-6"
+          class="ma-2 pa-5"
           outlined
           center
           tile
@@ -14,7 +14,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-6"
+          class="ma-2 pa-5"
           outlined
           tile
         >
@@ -24,7 +24,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-6"
+          class="ma-2 pa-5"
           outlined
           tile
         >
@@ -34,7 +34,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-6"
+          class="ma-2 pa-5"
           outlined
           tile
         >
@@ -44,7 +44,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-6"
+          class="ma-2 pa-5"
           outlined
           tile
         >
@@ -54,7 +54,7 @@
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-6"
+          class="ma-2 pa-5"
           outlined
           tile
         >
