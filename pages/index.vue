@@ -4,7 +4,7 @@
       <v-flex xs12 sm8 md6>
         <v-card>
           <v-card-title class="headline">
-            My Synth
+            {{$store.state.title}}
           </v-card-title>
           <v-card-text>
             <p>Click the buttons below or on a computer type the numbers 1-9 to make sounds.</p>

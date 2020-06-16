@@ -8,11 +8,11 @@
           center
           tile
         >
-          <v-slider 
-            v-model="sliderAttack" 
-            vertical 
-            thumb-label 
-            max="1000" 
+          <v-slider
+            v-model="sliderAttack"
+            vertical
+            thumb-label
+            max="1000"
           />
         </v-card>
       </v-col>
@@ -22,11 +22,11 @@
           outlined
           tile
         >
-          <v-slider 
-            v-model="sliderDecay" 
-            vertical 
-            thumb-label 
-            max="1000" 
+          <v-slider
+            v-model="sliderDecay"
+            vertical
+            thumb-label
+            max="1000"
           />
         </v-card>
       </v-col>
@@ -36,11 +36,11 @@
           outlined
           tile
         >
-          <v-slider 
-            v-model="sliderRelease" 
-            vertical 
-            thumb-label 
-            max="1000" 
+          <v-slider
+            v-model="sliderRelease"
+            vertical
+            thumb-label
+            max="1000"
           />
         </v-card>
       </v-col>
@@ -50,11 +50,11 @@
           outlined
           tile
         >
-          <v-slider 
-            v-model="sliderSustain" 
-            vertical 
-            thumb-label 
-            max="1000" 
+          <v-slider
+            v-model="sliderSustain"
+            vertical
+            thumb-label
+            max="1000"
           />
         </v-card>
       </v-col>
@@ -64,11 +64,11 @@
           outlined
           tile
         >
-          <v-slider 
-            v-model="sliderIndex" 
-            vertical 
-            thumb-label 
-            max="1000" 
+          <v-slider
+            v-model="sliderIndex"
+            vertical
+            thumb-label
+            max="1000"
           />
         </v-card>
       </v-col>
@@ -78,11 +78,11 @@
           outlined
           tile
         >
-          <v-slider 
-            v-model="noteNumber" 
-            vertical 
-            thumb-label 
-            max="10" 
+          <v-slider
+            v-model="noteNumber"
+            vertical
+            thumb-label
+            max="10"
           />
         </v-card>
       </v-col>
