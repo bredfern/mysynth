@@ -3,42 +3,42 @@
     <v-row dense>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-4"
+          class="ma-2 pa-6"
           outlined
           center
           tile
         >
-          <v-slider v-model="sliderAttack" thumb-label vertical />
+          <v-slider v-model="sliderAttack" vertical thumb-label max="1000" />
           A
         </v-card>
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-4"
+          class="ma-2 pa-6"
           outlined
           tile
         >
-          <v-slider v-model="sliderDecay" thumb-label vertical />
+          <v-slider v-model="sliderDecay" vertical thumb-label max="1000" />
           S
         </v-card>
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-4"
+          class="ma-2 pa-6"
           outlined
           tile
         >
-          <v-slider v-model="sliderRelease" thumb-label vertical />
+          <v-slider v-model="sliderRelease" vertical thumb-label max="1000" />
           D
         </v-card>
       </v-col>
       <v-col cols="2">
         <v-card
-          class="ma-2 pa-4"
+          class="ma-2 pa-6"
           outlined
           tile
         >
-          <v-slider v-model="sliderSustain" thumb-label vertical />
+          <v-slider v-model="sliderSustain" vertical thumb-label max="1000" />
           R
         </v-card>
       </v-col>
