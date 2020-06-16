@@ -8,8 +8,12 @@
           center
           tile
         >
-          <v-slider v-model="sliderAttack" vertical thumb-label max="1000" />
-          A
+          <v-slider 
+            v-model="sliderAttack" 
+            vertical 
+            thumb-label 
+            max="1000" 
+          />
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -18,8 +22,12 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderDecay" vertical thumb-label max="1000" />
-          S
+          <v-slider 
+            v-model="sliderDecay" 
+            vertical 
+            thumb-label 
+            max="1000" 
+          />
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -28,8 +36,12 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderRelease" vertical thumb-label max="1000" />
-          D
+          <v-slider 
+            v-model="sliderRelease" 
+            vertical 
+            thumb-label 
+            max="1000" 
+          />
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -38,8 +50,12 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderSustain" vertical thumb-label max="1000" />
-          R
+          <v-slider 
+            v-model="sliderSustain" 
+            vertical 
+            thumb-label 
+            max="1000" 
+          />
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -48,8 +64,12 @@
           outlined
           tile
         >
-          <v-slider v-model="sliderIndex" vertical thumb-label max="1000" />
-          I
+          <v-slider 
+            v-model="sliderIndex" 
+            vertical 
+            thumb-label 
+            max="1000" 
+          />
         </v-card>
       </v-col>
       <v-col cols="2">
@@ -58,8 +78,12 @@
           outlined
           tile
         >
-          <v-slider v-model="noteNumber" vertical thumb-label max="10" />
-          N
+          <v-slider 
+            v-model="noteNumber" 
+            vertical 
+            thumb-label 
+            max="10" 
+          />
         </v-card>
       </v-col>
     </v-row>

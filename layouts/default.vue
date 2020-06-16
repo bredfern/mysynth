@@ -29,7 +29,7 @@
       </v-container>
     </v-content>
     <v-footer :fixed="fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }} Design 418</span>
+      <span>&copy; {{ new Date().getFullYear() }} Brian Redfern</span>
     </v-footer>
   </v-app>
 </template>
