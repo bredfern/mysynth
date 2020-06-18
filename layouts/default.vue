@@ -29,7 +29,9 @@
       </v-container>
     </v-content>
     <v-footer :fixed="fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }} Brian Redfern</span>
+      <p>Click the buttons or on a keyboard type the numbers 1-9.</p>
+      <p> If your browser can use webmidi you can connect a midi controller.</p>
+      <p>&copy; {{ new Date().getFullYear() }} Brian Redfern</p>
     </v-footer>
   </v-app>
 </template>
