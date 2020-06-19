@@ -30,7 +30,7 @@
     <v-footer :fixed="fixed" app>
       <p>Click the buttons or on a keyboard type the numbers 1-9 to make sounds.</p> 
       <p>If your browser can use webmidi you can connect a midi controller to play.</p>
-      <p><span>&copy; {{ new Date().getFullYear() }} Brian Redfern</span></p>
+      <p>&copy; {{ new Date().getFullYear() }} Brian Redfern</p>
     </v-footer>
   </v-app>
 </template>
