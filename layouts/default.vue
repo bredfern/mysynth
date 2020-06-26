@@ -28,9 +28,12 @@
       </v-container>
     </v-content>
     <v-footer :fixed="fixed" app>
-      <p>Click the buttons or on a keyboard type the numbers 1-9 to make sounds.</p> 
-      <p>If your browser can use webmidi you can connect a midi controller to play.</p>
-      <p>&copy; {{ new Date().getFullYear() }} Brian Redfern</p>
+      <p>
+        &copy; {{ new Date().getFullYear() }}
+        <a href="https://bredfern.github.io">Brian Redfern</a> |
+        <a href="/mysynth/">Synth</a> |
+        <a href="/mysynth/help">Help</a>
+      </p>
     </v-footer>
   </v-app>
 </template>
@@ -45,7 +48,7 @@ export default {
       items: [
         {
           icon: 'mdi-apps',
-          title: 'Welcome',
+          title: 'My Synth',
           to: '/'
         },
         {
@@ -57,8 +60,25 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Vuetify.js'
+      title: 'My Synth'
     }
   }
 }
 </script>
+<style>
+.logo {
+   background: #2196f3;
+   width: 10rem;
+   height: 3rem;
+   margin-left: auto;
+   margin-right: auto;
+}
+
+.right {
+  float: right;
+ }
+
+a {
+  text-decoration: none;
+}
+</style>

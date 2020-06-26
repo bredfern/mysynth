@@ -4,7 +4,10 @@
       <v-flex xs12 sm8 md6>
         <v-card>
           <v-card-title class="headline">
-            <img src="~assets/logo.svg" class="logo" />
+            <img
+              src="~assets/logo.svg"
+              class="logo"
+            >
           </v-card-title>
           <v-card-actions>
             <v-spacer />
@@ -25,13 +28,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.logo {
-  background: #2196f3;
-  width: 10rem;
-  height: 3rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>
