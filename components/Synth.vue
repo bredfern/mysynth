@@ -115,9 +115,9 @@ export default {
   data () {
     return {
       sliderAttack: 0,
-      sliderRelease: 60,
-      sliderDecay: 60,
-      sliderSustain: 60,
+      sliderRelease: 0.60,
+      sliderDecay: 0.60,
+      sliderSustain: 0.60,
       sliderIndex: 6,
       noteNumber: 2,
       notes: [
