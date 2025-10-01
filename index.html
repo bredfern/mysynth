@@ -3,77 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Synth Virtual Analog</title>
+    <title>Web Component Synthesizer</title>
     <style>
         :root {
             --bg-color: #282c34;
-            --control-bg: #444b58;
             --text-color: #abb2bf;
-            --accent-color: #61afef;
-            --led-off: #3a3f4b;
-            --led-on: #c678dd;
-            --led-active: #98c379;
         }
-        html {
-            box-sizing: border-box;
-        }
-        *, *:before, *:after {
-            box-sizing: inherit;
-        }
+        html { box-sizing: border-box; }
+        *, *:before, *:after { box-sizing: inherit; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
             margin: 0;
-            min-height: 100vh;
-            -webkit-user-select: none;
-            user-select: none;
+            padding: 10px;
         }
-        .synth-container {
-            background-color: var(--control-bg);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            width: 100%;
-            max-width: 900px;
-        }
-        h2 { text-align: center; margin-top: 0; color: var(--accent-color); border-bottom: 1px solid #555; padding-bottom: 10px; }
-        .control-group {
-            background: #333944;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .control-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 20px; }
-        .control { display: flex; flex-direction: column; align-items: center; }
-        label { margin-bottom: 8px; font-size: 0.9em; }
-        input[type="range"] { width: 100px; }
-        button, input[type="file"] {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        button:hover { background-color: #529bde; }
+    </style>
+</head>
+<body>
 
-        /* --- Sequencer CSS --- */
-        .sequencer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
-            gap: 8px;
-            margin-top: 10px;
-            align-items: end;
-        }
-        .seq-step-container {
+<synth-app></synth-app>
+
+<template id="sequencer-step-template">
+    <style>
+        :host {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -88,73 +41,106 @@
             margin: 0;
         }
         .pitch-slider:disabled { opacity: 0.5; }
-        .seq-step {
+        .step-button {
             width: 100%;
             height: 25px;
-            background-color: var(--led-off);
+            background-color: var(--led-off, #3a3f4b);
             border-radius: 4px;
             cursor: pointer;
             position: relative;
             transition: background-color 0.1s;
         }
-        .seq-step.active { background-color: var(--led-on); }
-        .seq-step.current::after {
+        :host([active]) .step-button { background-color: var(--led-on, #c678dd); }
+        :host([current]) .step-button::after {
             content: '';
             position: absolute;
             top: -4px; right: -4px; bottom: -4px; left: -4px;
-            border: 2px solid var(--led-active);
+            border: 2px solid var(--led-active, #98c379);
             border-radius: 6px;
         }
-        .seq-step .has-data {
+        .has-data {
             position: absolute;
             top: 2px;
             left: 2px;
             width: 6px;
             height: 6px;
-            background-color: var(--accent-color);
+            background-color: var(--accent-color, #61afef);
             border-radius: 50%;
+            display: none;
         }
+        :host([has-data]) .has-data { display: block; }
 
-        /* --- Responsive Adjustments for Smaller Screens --- */
         @media (max-width: 600px) {
-            body {
-                padding: 10px;
-                display: block; /* Allow scrolling on small screens */
-            }
-            .synth-container {
-                padding: 15px;
-                gap: 15px;
-            }
-            .control-grid {
-                gap: 15px; /* Reduce gap between controls */
-            }
-            .sequencer-grid {
-                gap: 5px; /* Even tighter for the compact sequencer */
-            }
+            .pitch-slider { height: 60px; }
+        }
+    </style>
+    <input type="range" class="pitch-slider" min="36" max="84" value="60" step="1">
+    <div class="step-button">
+        <div class="has-data"></div>
+    </div>
+</template>
+
+<template id="synth-app-template">
+    <style>
+        :host {
+            --control-bg: #444b58;
+            --accent-color: #61afef;
+            --led-off: #3a3f4b;
+            --led-on: #c678dd;
+            --led-active: #98c379;
+
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--control-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        h2, h3, h4 { margin: 0; text-align: center; }
+        h2 { color: var(--accent-color); border-bottom: 1px solid #555; padding-bottom: 10px; }
+        h4 { margin-bottom:10px; margin-top:20px; }
+        .control-group { background: #333944; padding: 15px; border-radius: 8px; }
+        .control-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 20px; }
+        .control { display: flex; flex-direction: column; align-items: center; }
+        label { margin-bottom: 8px; font-size: 0.9em; }
+        input[type="range"] { width: 100px; }
+        button, input[type="file"] {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover { background-color: #529bde; }
+        #tuningName { font-size: 0.8em; margin-top: 5px; }
+
+        @media (max-width: 600px) {
+            :host { padding: 15px; gap: 15px; }
+            .control-grid { gap: 15px; }
             h2 { font-size: 1.5em; }
             h3, h4 { font-size: 1.1em; }
             label { font-size: 0.85em; }
-            .pitch-slider {
-                height: 60px; /* Make sliders a bit shorter on mobile */
-            }
         }
         @media (max-width: 400px) {
-            .synth-container { padding: 10px; }
+            :host { padding: 10px; }
             .control-group { padding: 10px; }
         }
     </style>
-</head>
-<body>
 
-<div class="synth-container">
-    <h2>My Synth</h2>
+    <h2>Web Component Synthesizer</h2>
 
     <div class="control-group">
         <div class="control-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
             <div class="control">
                 <button id="startStopBtn">Start</button>
                 <span>Tempo: <span id="tempoValue">120</span> BPM</span>
-                <input type="range" id="tempo" min="30" max="240" value="120" class="slider">
+                <input type="range" id="tempo" min="30" max="240" value="120">
             </div>
              <div class="control">
                 <label>Save/Load</label>
@@ -166,7 +152,7 @@
                 <label>Tuning</label>
                 <button id="loadScl">Load .scl</button>
                 <input type="file" id="tuningFile" accept=".scl" style="display:none;">
-                <span id="tuningName" style="font-size: 0.8em; margin-top: 5px;">12-TET</span>
+                <span id="tuningName">12-TET</span>
             </div>
         </div>
     </div>
@@ -174,15 +160,7 @@
     <div class="control-group">
         <h3>SYNTHESIZER</h3>
         <div class="control-grid">
-            <div class="control">
-                <label>Waveform</label>
-                <select id="osc-waveform">
-                    <option value="sawtooth">Sawtooth</option>
-                    <option value="square">Square</option>
-                    <option value="triangle">Triangle</option>
-                    <option value="sine">Sine</option>
-                </select>
-            </div>
+            <div class="control"><label>Waveform</label><select id="osc-waveform"><option value="sawtooth">Sawtooth</option><option value="square">Square</option><option value="triangle">Triangle</option><option value="sine">Sine</option></select></div>
             <div class="control"><label>Filter Cutoff</label><input type="range" id="filter-cutoff" min="20" max="8000" value="1000" step="1"></div>
             <div class="control"><label>Filter Resonance</label><input type="range" id="filter-resonance" min="0.1" max="18" value="1" step="0.1"></div>
             <div class="control"><label>Pitch LFO Rate</label><input type="range" id="pitch-lfo-rate" min="0.1" max="20" value="5" step="0.1"></div>
@@ -190,7 +168,7 @@
             <div class="control"><label>Cutoff LFO Rate</label><input type="range" id="cutoff-lfo-rate" min="0.1" max="20" value="2" step="0.1"></div>
             <div class="control"><label>Cutoff LFO Depth</label><input type="range" id="cutoff-lfo-depth" min="0" max="4000" value="0" step="10"></div>
         </div>
-        <h4 style="text-align:center; margin-bottom:10px; margin-top:20px;">ADSR Envelope</h4>
+        <h4>ADSR Envelope</h4>
         <div class="control-grid">
             <div class="control"><label>Attack</label><input type="range" id="env-attack" min="0.01" max="2" value="0.02" step="0.01"></div>
             <div class="control"><label>Decay</label><input type="range" id="env-decay" min="0.01" max="2" value="0.2" step="0.01"></div>
@@ -206,7 +184,7 @@
             <div class="control"><label>Echo Time</label><input type="range" id="delay-time" min="0" max="1" value="0.25" step="0.01"></div>
             <div class="control"><label>Echo Feedback</label><input type="range" id="delay-feedback" min="0" max="0.9" value="0.4" step="0.01"></div>
         </div>
-         <div class="control-grid" style="margin-top: 15px;">
+        <div class="control-grid" style="margin-top: 15px;">
             <div class="control"><label>EQ Low</label><input type="range" class="eq-gain" data-freq="250" min="-24" max="24" value="0" step="1"></div>
             <div class="control"><label>EQ Mid</label><input type="range" class="eq-gain" data-freq="1000" min="-24" max="24" value="0" step="1"></div>
             <div class="control"><label>EQ High</label><input type="range" class="eq-gain" data-freq="4000" min="-24" max="24" value="0" step="1"></div>
@@ -214,343 +192,407 @@
     </div>
 
     <div class="control-group">
-        <h3>SEQUENCER (Set pitch then click button. SHIFT+Click to save params)</h3>
-        <div id="sequencer" class="sequencer-grid"></div>
+        <h3>SEQUENCER</h3>
+        <step-sequencer></step-sequencer>
     </div>
-</div>
+</template>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Global Variables & State ---
-    let audioContext;
-    let mainGain;
-    let isPlaying = false;
-    let currentStep = 0;
-    let tempo = 120;
-    let nextStepTime = 0.0;
-    let timerID;
+// --- Component: A single sequencer step ---
+class SequencerStep extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        const template = document.getElementById('sequencer-step-template');
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-    let baseMidiNote = 60; // C4
-    let baseFrequency = 261.626;
-    let scaleRatios = Array.from({ length: 128 }, (_, i) => Math.pow(2, (i - baseMidiNote) / 12));
-
-    let convolver, reverbGain, delay, feedback, eqBands = [];
-    const voices = [];
-    const sequencerData = Array(16).fill(null);
-    const sequencerStepParams = Array(16).fill(null);
-
-    const startStopBtn = document.getElementById('startStopBtn');
-    const tempoSlider = document.getElementById('tempo');
-    const tempoValue = document.getElementById('tempoValue');
-    const sequencerGrid = document.getElementById('sequencer');
-
-    // --- Audio Initialization ---
-    function initAudio() {
-        if (audioContext) return;
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        mainGain = audioContext.createGain();
-        mainGain.gain.value = 0.7;
-
-        const eqGains = document.querySelectorAll('.eq-gain');
-        let lastNode = mainGain;
-
-        ['lowshelf', 'peaking', 'highshelf'].forEach((type, i) => {
-            const eq = audioContext.createBiquadFilter();
-            eq.type = type;
-            eq.frequency.value = parseFloat(eqGains[i].dataset.freq);
-            eq.gain.value = parseFloat(eqGains[i].value);
-            lastNode.connect(eq); lastNode = eq; eqBands.push(eq);
-        });
-
-        delay = audioContext.createDelay();
-        delay.delayTime.value = parseFloat(document.getElementById('delay-time').value);
-        feedback = audioContext.createGain();
-        feedback.gain.value = parseFloat(document.getElementById('delay-feedback').value);
-        lastNode.connect(delay); delay.connect(feedback); feedback.connect(delay); lastNode = delay;
-
-        convolver = audioContext.createConvolver();
-        reverbGain = audioContext.createGain();
-        reverbGain.gain.value = parseFloat(document.getElementById('reverb-mix').value);
-        lastNode.connect(convolver); convolver.connect(reverbGain); reverbGain.connect(audioContext.destination);
-        lastNode.connect(audioContext.destination);
-
-        createReverbImpulseResponse();
-        console.log("Audio Context Initialized");
+        this._slider = this.shadowRoot.querySelector('.pitch-slider');
+        this._button = this.shadowRoot.querySelector('.step-button');
     }
 
-    function createReverbImpulseResponse() {
-        const rate = audioContext.sampleRate, length = rate * 2;
-        const impulse = audioContext.createBuffer(2, length, rate);
+    connectedCallback() {
+        this._button.addEventListener('click', this._onClick.bind(this));
+        this._slider.addEventListener('input', this._onSliderInput.bind(this));
+    }
+
+    static get observedAttributes() {
+        return ['active', 'current', 'has-data', 'note', 'disabled'];
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        switch (name) {
+            case 'note': this._slider.value = newValue; break;
+            case 'disabled': this._slider.disabled = this.hasAttribute('disabled'); break;
+        }
+    }
+
+    _onClick(e) {
+        this.dispatchEvent(new CustomEvent('stepclick', {
+            bubbles: true, composed: true,
+            detail: { shiftKey: e.shiftKey }
+        }));
+    }
+
+    _onSliderInput(e) {
+        this.dispatchEvent(new CustomEvent('sliderinput', {
+            bubbles: true, composed: true,
+            detail: { note: parseInt(e.target.value, 10) }
+        }));
+    }
+}
+customElements.define('sequencer-step', SequencerStep);
+
+// --- Component: The main step sequencer grid ---
+class StepSequencer extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.innerHTML = `
+            <style>
+                :host { display: block; }
+                .grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+                    gap: 8px;
+                    align-items: end;
+                }
+                @media (max-width: 600px) { .grid { gap: 5px; } }
+            </style>
+            <div class="grid"></div>
+        `;
+        this._grid = this.shadowRoot.querySelector('.grid');
+    }
+
+    connectedCallback() {
+        for (let i = 0; i < 16; i++) {
+            const step = document.createElement('sequencer-step');
+            step.dataset.index = i;
+            this._grid.appendChild(step);
+        }
+    }
+
+    updateStep(index, data) {
+        const step = this._grid.children[index];
+        if (!step) return;
+
+        Object.keys(data).forEach(key => {
+            const value = data[key];
+            if (value === true) step.setAttribute(key, '');
+            else if (value === false) step.removeAttribute(key);
+            else step.setAttribute(key, value);
+        });
+    }
+}
+customElements.define('step-sequencer', StepSequencer);
+
+// --- Component: The main synthesizer application ---
+class SynthApp extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        const template = document.getElementById('synth-app-template');
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+        // App State
+        this.audioContext = null;
+        this.mainGain = null;
+        this.isPlaying = false;
+        this.currentStep = 0;
+        this.tempo = 120;
+        this.nextStepTime = 0.0;
+        this.timerID = null;
+        this.baseMidiNote = 60;
+        this.baseFrequency = 261.626;
+        this.scaleRatios = Array.from({ length: 128 }, (_, i) => Math.pow(2, (i - this.baseMidiNote) / 12));
+        this.effects = {};
+        this.sequencerData = Array(16).fill(null);
+        this.sequencerStepParams = Array(16).fill(null);
+    }
+
+    connectedCallback() {
+        this.sequencer = this.shadowRoot.querySelector('step-sequencer');
+        this.renderSequencerState();
+        this.addEventListeners();
+    }
+
+    // --- Event Listeners Setup ---
+    addEventListeners() {
+        // Transport & File I/O
+        this.shadowRoot.getElementById('startStopBtn').addEventListener('click', () => this.isPlaying ? this.stopSequencer() : this.startSequencer());
+        this.shadowRoot.getElementById('tempo').addEventListener('input', e => {
+            this.tempo = parseFloat(e.target.value);
+            this.shadowRoot.getElementById('tempoValue').textContent = this.tempo;
+        });
+        this.shadowRoot.getElementById('saveSong').addEventListener('click', () => this.saveSong());
+        this.shadowRoot.getElementById('loadSong').addEventListener('click', () => this.shadowRoot.getElementById('loadSongInput').click());
+        this.shadowRoot.getElementById('loadSongInput').addEventListener('change', e => this.handleFileLoad(e, this.loadSong.bind(this)));
+        this.shadowRoot.getElementById('loadScl').addEventListener('click', () => this.shadowRoot.getElementById('tuningFile').click());
+        this.shadowRoot.getElementById('tuningFile').addEventListener('change', e => this.handleFileLoad(e, this.parseScl.bind(this), e.target.files[0].name));
+
+        // Sequencer Interaction
+        this.sequencer.addEventListener('stepclick', e => {
+            const index = parseInt(e.target.dataset.index, 10);
+            if (e.detail.shiftKey) {
+                this.sequencerStepParams[index] = this.sequencerStepParams[index] ? null : this.getGlobalSynthParams();
+            } else {
+                this.sequencerData[index] = this.sequencerData[index] === null ? parseInt(e.target.getAttribute('note') || 60, 10) : null;
+            }
+            this.renderSequencerState();
+        });
+        this.sequencer.addEventListener('sliderinput', e => {
+            const index = parseInt(e.target.dataset.index, 10);
+            if (this.sequencerData[index] !== null) {
+                this.sequencerData[index] = e.detail.note;
+            }
+        });
+
+        // Effects listeners
+        this.shadowRoot.querySelectorAll('.control-group input, .control-group select').forEach(el => {
+            el.addEventListener('input', e => {
+                if(!this.audioContext || !this.effects.reverbGain) return;
+                switch(e.target.id) {
+                    case 'reverb-mix': this.effects.reverbGain.gain.value = parseFloat(e.target.value); break;
+                    case 'delay-time': this.effects.delay.delayTime.value = parseFloat(e.target.value); break;
+                    case 'delay-feedback': this.effects.feedback.gain.value = parseFloat(e.target.value); break;
+                }
+                if(e.target.classList.contains('eq-gain')) {
+                    const index = Array.from(this.shadowRoot.querySelectorAll('.eq-gain')).indexOf(e.target);
+                    if (this.effects.eqBands[index]) this.effects.eqBands[index].gain.value = parseFloat(e.target.value);
+                }
+            });
+        });
+    }
+
+    // --- Audio Engine ---
+    initAudio() {
+        if (this.audioContext) return;
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.mainGain = this.audioContext.createGain(); this.mainGain.gain.value = 0.7;
+        let lastNode = this.mainGain;
+
+        this.effects.eqBands = [];
+        ['lowshelf', 'peaking', 'highshelf'].forEach((type, i) => {
+            const eq = this.audioContext.createBiquadFilter();
+            eq.type = type; eq.frequency.value = [250, 1000, 4000][i];
+            lastNode.connect(eq); lastNode = eq; this.effects.eqBands.push(eq);
+        });
+
+        this.effects.delay = this.audioContext.createDelay();
+        this.effects.feedback = this.audioContext.createGain();
+        lastNode.connect(this.effects.delay); this.effects.delay.connect(this.effects.feedback); this.effects.feedback.connect(this.effects.delay);
+        lastNode = this.effects.delay;
+
+        this.effects.convolver = this.audioContext.createConvolver();
+        this.effects.reverbGain = this.audioContext.createGain();
+        lastNode.connect(this.effects.convolver); this.effects.convolver.connect(this.effects.reverbGain);
+        this.effects.reverbGain.connect(this.audioContext.destination);
+        lastNode.connect(this.audioContext.destination);
+
+        // Set initial values
+        this.shadowRoot.querySelectorAll('input[type=range], select').forEach(el => el.dispatchEvent(new Event('input')));
+        this.createReverbImpulseResponse();
+    }
+
+    createReverbImpulseResponse() { /* ... function content unchanged ... */ }
+    getFrequencyForNote(note) { /* ... function content unchanged ... */ }
+
+    // --- Sequencer Logic ---
+    startSequencer() { /* ... function content largely unchanged, but references this.* properties ... */ }
+    stopSequencer() { /* ... function content unchanged ... */ }
+    scheduler() { /* ... function content largely unchanged, but references this.* properties ... */ }
+    scheduleStep(stepIndex, time) { /* ... function content largely unchanged ... */ }
+    playSequencerNoteAtTime(note, time, params) { /* ... function content unchanged ... */ }
+    updateSequencerUI(currentPlayingStep) {
+        for(let i=0; i<16; i++) {
+            this.sequencer.updateStep(i, { current: i === currentPlayingStep });
+        }
+    }
+    renderSequencerState() {
+        for(let i=0; i<16; i++) {
+            const stepIsActive = this.sequencerData[i] !== null;
+            this.sequencer.updateStep(i, {
+                active: stepIsActive,
+                'has-data': this.sequencerStepParams[i] !== null,
+                note: stepIsActive ? this.sequencerData[i] : 60,
+                disabled: !stepIsActive
+            });
+        }
+    }
+
+    // --- State & File Management ---
+    getGlobalSynthParams() { /* ... function content unchanged, but queries shadowRoot ... */ }
+    applyGlobalSynthParams(params) { /* ... function content unchanged, but queries shadowRoot ... */ }
+    saveSong() { /* ... function content unchanged ... */ }
+    loadSong(songData) { /* ... function content unchanged, but calls this.renderSequencerState() ... */ }
+    parseScl(sclData, fileName) { /* ... function content unchanged ... */ }
+    handleFileLoad(event, callback, fileName) { /* ... function content unchanged ... */ }
+}
+
+// Full function bodies for SynthApp methods (to keep constructor cleaner)
+{
+    SynthApp.prototype.createReverbImpulseResponse = function() {
+        const rate = this.audioContext.sampleRate, length = rate * 2;
+        const impulse = this.audioContext.createBuffer(2, length, rate);
         for (let i = 0; i < length; i++) {
             impulse.getChannelData(0)[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.5);
             impulse.getChannelData(1)[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.5);
         }
-        convolver.buffer = impulse;
+        this.effects.convolver.buffer = impulse;
     }
 
-    // --- Synthesizer Voice Class ---
-    class Voice {
-        constructor(note) {
-            this.note = note;
-            this.gate = false;
-
-            this.osc = audioContext.createOscillator();
-            this.filter = audioContext.createBiquadFilter();
-            this.vca = audioContext.createGain();
-            this.pitchLFO = audioContext.createOscillator();
-            this.pitchLFOGain = audioContext.createGain();
-            this.cutoffLFO = audioContext.createOscillator();
-            this.cutoffLFOGain = audioContext.createGain();
-
-            this.pitchLFO.connect(this.pitchLFOGain); this.pitchLFOGain.connect(this.osc.detune);
-            this.cutoffLFO.connect(this.cutoffLFOGain); this.cutoffLFOGain.connect(this.filter.frequency);
-            this.osc.connect(this.filter); this.filter.connect(this.vca); this.vca.connect(mainGain);
-
-            this.vca.gain.value = 0;
-            this.osc.frequency.value = getFrequencyForNote(note);
-            this.filter.type = 'lowpass';
-
-            this.applyParams(getGlobalSynthParams());
-
-            this.osc.start(); this.pitchLFO.start(); this.cutoffLFO.start();
-        }
-
-        noteOn(velocity = 1) {
-            this.gate = true;
-            const now = audioContext.currentTime;
-            const adsr = getGlobalSynthParams().adsr;
-            this.vca.gain.cancelScheduledValues(now);
-            this.vca.gain.setValueAtTime(0, now);
-            this.vca.gain.linearRampToValueAtTime(velocity, now + adsr.attack);
-            this.vca.gain.linearRampToValueAtTime(adsr.sustain * velocity, now + adsr.attack + adsr.decay);
-        }
-
-        noteOff() {
-            if (!this.gate) return;
-            this.gate = false;
-            const now = audioContext.currentTime;
-            const releaseTime = parseFloat(document.getElementById('env-release').value);
-            this.vca.gain.cancelScheduledValues(now);
-            this.vca.gain.setValueAtTime(this.vca.gain.value, now);
-            this.vca.gain.linearRampToValueAtTime(0, now + releaseTime);
-            setTimeout(() => this.disconnect(), (releaseTime * 1000) + 50);
-        }
-
-        applyParams(params) {
-            this.osc.type = params.waveform;
-            this.filter.frequency.setTargetAtTime(params.cutoff, audioContext.currentTime, 0.01);
-            this.filter.Q.setTargetAtTime(params.resonance, audioContext.currentTime, 0.01);
-            this.pitchLFO.frequency.setTargetAtTime(params.pitchLfoRate, audioContext.currentTime, 0.01);
-            this.pitchLFOGain.gain.setTargetAtTime(params.pitchLfoDepth, audioContext.currentTime, 0.01);
-            this.cutoffLFO.frequency.setTargetAtTime(params.cutoffLfoRate, audioContext.currentTime, 0.01);
-            this.cutoffLFOGain.gain.setTargetAtTime(params.cutoffLfoDepth, audioContext.currentTime, 0.01);
-        }
-
-        disconnect() {
-            this.osc.stop(); this.pitchLFO.stop(); this.cutoffLFO.stop();
-            this.osc.disconnect(); this.filter.disconnect(); this.vca.disconnect();
-            this.pitchLFO.disconnect(); this.cutoffLFO.disconnect();
-        }
-    }
-
-    function getFrequencyForNote(note) {
+    SynthApp.prototype.getFrequencyForNote = function(note) {
         if (note < 0 || note > 127) return 0;
-        return baseFrequency * scaleRatios[note];
+        return this.baseFrequency * this.scaleRatios[note];
     }
 
-    // --- Sequencer Logic ---
-    function scheduler() {
-        while (nextStepTime < audioContext.currentTime + 0.1) {
-            scheduleStep(currentStep, nextStepTime);
-            nextStepTime += (60.0 / tempo) / 4;
-            currentStep = (currentStep + 1) % 16;
+    SynthApp.prototype.startSequencer = function() {
+        if (this.isPlaying) return;
+        if (!this.audioContext) this.initAudio();
+        this.isPlaying = true;
+        this.currentStep = 0;
+        this.nextStepTime = this.audioContext.currentTime;
+        this.scheduler();
+        this.shadowRoot.getElementById('startStopBtn').textContent = 'Stop';
+    }
+
+    SynthApp.prototype.stopSequencer = function() {
+        this.isPlaying = false;
+        window.clearTimeout(this.timerID);
+        this.shadowRoot.getElementById('startStopBtn').textContent = 'Start';
+        this.updateSequencerUI(-1);
+    }
+
+    SynthApp.prototype.scheduler = function() {
+        while (this.nextStepTime < this.audioContext.currentTime + 0.1) {
+            this.scheduleStep(this.currentStep, this.nextStepTime);
+            this.nextStepTime += (60.0 / this.tempo) / 4;
+            this.currentStep = (this.currentStep + 1) % 16;
         }
-        timerID = window.setTimeout(scheduler, 25.0);
+        this.timerID = window.setTimeout(this.scheduler.bind(this), 25.0);
     }
 
-    function scheduleStep(stepIndex, time) {
-        const note = sequencerData[stepIndex];
+    SynthApp.prototype.scheduleStep = function(stepIndex, time) {
+        const note = this.sequencerData[stepIndex];
         if (note !== null) {
-            const params = sequencerStepParams[stepIndex] || getGlobalSynthParams();
-            playSequencerNoteAtTime(note, time, params);
+            const params = this.sequencerStepParams[stepIndex] || this.getGlobalSynthParams();
+            this.playSequencerNoteAtTime(note, time, params);
         }
-        setTimeout(() => updateSequencerUI(stepIndex), (time - audioContext.currentTime) * 1000);
+        setTimeout(() => this.updateSequencerUI(stepIndex), (time - this.audioContext.currentTime) * 1000);
     }
 
-    function playSequencerNoteAtTime(note, time, params) {
-        const voice = new Voice(note);
+    SynthApp.prototype.playSequencerNoteAtTime = function(note, time, params) {
+        // Voice class can be defined locally here, as it's only used by the audio engine
+        class Voice {
+            constructor(note, app) {
+                this.note = note;
+                this.app = app;
+                const ac = app.audioContext;
+
+                this.osc = ac.createOscillator();
+                this.filter = ac.createBiquadFilter();
+                this.vca = ac.createGain();
+                this.pitchLFO = ac.createOscillator();
+                this.pitchLFOGain = ac.createGain();
+                this.cutoffLFO = ac.createOscillator();
+                this.cutoffLFOGain = ac.createGain();
+
+                this.pitchLFO.connect(this.pitchLFOGain); this.pitchLFOGain.connect(this.osc.detune);
+                this.cutoffLFO.connect(this.cutoffLFOGain); this.cutoffLFOGain.connect(this.filter.frequency);
+                this.osc.connect(this.filter); this.filter.connect(this.vca); this.vca.connect(app.mainGain);
+
+                this.vca.gain.value = 0;
+                this.osc.frequency.value = app.getFrequencyForNote(note);
+                this.filter.type = 'lowpass';
+
+                this.osc.start(); this.pitchLFO.start(); this.cutoffLFO.start();
+            }
+            applyParams(params) {
+                const ac = this.app.audioContext;
+                this.osc.type = params.waveform;
+                this.filter.frequency.setTargetAtTime(params.cutoff, ac.currentTime, 0.01);
+                this.filter.Q.setTargetAtTime(params.resonance, ac.currentTime, 0.01);
+                this.pitchLFO.frequency.setTargetAtTime(params.pitchLfoRate, ac.currentTime, 0.01);
+                this.pitchLFOGain.gain.setTargetAtTime(params.pitchLfoDepth, ac.currentTime, 0.01);
+                this.cutoffLFO.frequency.setTargetAtTime(params.cutoffLfoRate, ac.currentTime, 0.01);
+                this.cutoffLFOGain.gain.setTargetAtTime(params.cutoffLfoDepth, ac.currentTime, 0.01);
+            }
+            disconnect() {
+                this.osc.stop(); this.pitchLFO.stop(); this.cutoffLFO.stop();
+                this.osc.disconnect(); this.filter.disconnect(); this.vca.disconnect();
+                this.pitchLFO.disconnect(); this.cutoffLFO.disconnect();
+            }
+        }
+
+        const voice = new Voice(note, this);
         voice.applyParams(params);
-        const noteDuration = (60.0 / tempo) / 4 * 0.95;
+        const noteDuration = (60.0 / this.tempo) / 4 * 0.95;
         const noteEndTime = time + noteDuration;
         const { attack, decay, sustain, release } = params.adsr;
-
         voice.vca.gain.setValueAtTime(0, time);
         voice.vca.gain.linearRampToValueAtTime(1.0, time + attack);
         voice.vca.gain.linearRampToValueAtTime(sustain, time + attack + decay);
         voice.vca.gain.setValueAtTime(sustain, noteEndTime);
         voice.vca.gain.linearRampToValueAtTime(0, noteEndTime + release);
-
-        setTimeout(() => voice.disconnect(), (noteEndTime + release - audioContext.currentTime) * 1000 + 50);
+        setTimeout(() => voice.disconnect(), (noteEndTime + release - this.audioContext.currentTime) * 1000 + 50);
     }
 
-    function startSequencer() {
-        if (isPlaying) return;
-        if (!audioContext) initAudio();
-        isPlaying = true; currentStep = 0; nextStepTime = audioContext.currentTime;
-        scheduler(); startStopBtn.textContent = 'Stop';
-    }
-
-    function stopSequencer() {
-        isPlaying = false; window.clearTimeout(timerID);
-        startStopBtn.textContent = 'Start'; updateSequencerUI(-1);
-    }
-
-    // --- UI & Event Handlers ---
-    function setupUI() {
-        for (let i = 0; i < 16; i++) {
-            const container = document.createElement('div');
-            container.className = 'seq-step-container';
-
-            const slider = document.createElement('input');
-            slider.type = 'range';
-            slider.className = 'pitch-slider';
-            slider.min = 36; // C2
-            slider.max = 84; // C6
-            slider.value = 60; // C4
-            slider.step = 1;
-            slider.dataset.index = i;
-
-            const stepButton = document.createElement('div');
-            stepButton.className = 'seq-step';
-            stepButton.dataset.index = i;
-
-            slider.addEventListener('input', handleSliderChange);
-            stepButton.addEventListener('click', handleStepClick);
-
-            container.appendChild(slider);
-            container.appendChild(stepButton);
-            sequencerGrid.appendChild(container);
-        }
-    }
-
-    function handleStepClick(event) {
-        const index = parseInt(event.target.dataset.index);
-
-        if (event.shiftKey) {
-            sequencerStepParams[index] = sequencerStepParams[index] ? null : getGlobalSynthParams();
-        } else {
-            const slider = document.querySelector(`.pitch-slider[data-index='${index}']`);
-            if (sequencerData[index] === null) {
-                sequencerData[index] = parseInt(slider.value, 10);
-            } else {
-                sequencerData[index] = null;
-            }
-        }
-        renderSequencerState();
-    }
-
-    function handleSliderChange(event) {
-        const index = parseInt(event.target.dataset.index, 10);
-        if (sequencerData[index] !== null) {
-            sequencerData[index] = parseInt(event.target.value, 10);
-        }
-    }
-
-    function updateSequencerUI(currentPlayingStep) {
-        document.querySelectorAll('.seq-step').forEach((step, i) => {
-            step.classList.toggle('current', i === currentPlayingStep);
-        });
-    }
-
-    function renderSequencerState() {
-        for(let i=0; i<16; i++) {
-            const container = sequencerGrid.children[i];
-            const slider = container.querySelector('.pitch-slider');
-            const stepButton = container.querySelector('.seq-step');
-
-            const stepIsActive = sequencerData[i] !== null;
-            stepButton.classList.toggle('active', stepIsActive);
-            slider.disabled = !stepIsActive;
-
-            if (stepIsActive) {
-                slider.value = sequencerData[i];
-            }
-
-            let dataIndicator = stepButton.querySelector('.has-data');
-            if (sequencerStepParams[i] && !dataIndicator) {
-                dataIndicator = document.createElement('div');
-                dataIndicator.className = 'has-data';
-                stepButton.appendChild(dataIndicator);
-            } else if (!sequencerStepParams[i] && dataIndicator) {
-                stepButton.removeChild(dataIndicator);
-            }
-        }
-    }
-
-    startStopBtn.addEventListener('click', () => isPlaying ? stopSequencer() : startSequencer());
-    tempoSlider.addEventListener('input', (e) => { tempo = parseFloat(e.target.value); tempoValue.textContent = tempo; });
-
-    // --- Parameter & State Management ---
-    function getGlobalSynthParams() {
+    SynthApp.prototype.getGlobalSynthParams = function() {
+        const s = (id) => this.shadowRoot.getElementById(id);
         return {
-            waveform: document.getElementById('osc-waveform').value,
-            cutoff: parseFloat(document.getElementById('filter-cutoff').value),
-            resonance: parseFloat(document.getElementById('filter-resonance').value),
-            pitchLfoRate: parseFloat(document.getElementById('pitch-lfo-rate').value),
-            pitchLfoDepth: parseFloat(document.getElementById('pitch-lfo-depth').value),
-            cutoffLfoRate: parseFloat(document.getElementById('cutoff-lfo-rate').value),
-            cutoffLfoDepth: parseFloat(document.getElementById('cutoff-lfo-depth').value),
+            waveform: s('osc-waveform').value,
+            cutoff: parseFloat(s('filter-cutoff').value), resonance: parseFloat(s('filter-resonance').value),
+            pitchLfoRate: parseFloat(s('pitch-lfo-rate').value), pitchLfoDepth: parseFloat(s('pitch-lfo-depth').value),
+            cutoffLfoRate: parseFloat(s('cutoff-lfo-rate').value), cutoffLfoDepth: parseFloat(s('cutoff-lfo-depth').value),
             adsr: {
-                attack: parseFloat(document.getElementById('env-attack').value),
-                decay: parseFloat(document.getElementById('env-decay').value),
-                sustain: parseFloat(document.getElementById('env-sustain').value),
-                release: parseFloat(document.getElementById('env-release').value),
+                attack: parseFloat(s('env-attack').value), decay: parseFloat(s('env-decay').value),
+                sustain: parseFloat(s('env-sustain').value), release: parseFloat(s('env-release').value),
             }
         };
     }
 
-    function applyGlobalSynthParams(params) {
-        document.getElementById('osc-waveform').value = params.waveform;
-        document.getElementById('filter-cutoff').value = params.cutoff;
-        document.getElementById('filter-resonance').value = params.resonance;
-        document.getElementById('pitch-lfo-rate').value = params.pitchLfoRate;
-        document.getElementById('pitch-lfo-depth').value = params.pitchLfoDepth;
-        document.getElementById('cutoff-lfo-rate').value = params.cutoffLfoRate;
-        document.getElementById('cutoff-lfo-depth').value = params.cutoffLfoDepth;
-        document.getElementById('env-attack').value = params.adsr.attack;
-        document.getElementById('env-decay').value = params.adsr.decay;
-        document.getElementById('env-sustain').value = params.adsr.sustain;
-        document.getElementById('env-release').value = params.adsr.release;
+    SynthApp.prototype.applyGlobalSynthParams = function(params) {
+        const s = (id, val) => this.shadowRoot.getElementById(id).value = val;
+        s('osc-waveform', params.waveform);
+        s('filter-cutoff', params.cutoff); s('filter-resonance', params.resonance);
+        s('pitch-lfo-rate', params.pitchLfoRate); s('pitch-lfo-depth', params.pitchLfoDepth);
+        s('cutoff-lfo-rate', params.cutoffLfoRate); s('cutoff-lfo-depth', params.cutoffLfoDepth);
+        s('env-attack', params.adsr.attack); s('env-decay', params.adsr.decay);
+        s('env-sustain', params.adsr.sustain); s('env-release', params.adsr.release);
     }
 
-    // --- Effects & File Handlers ---
-    document.querySelectorAll('.control-group input, .control-group select').forEach(el => {
-        el.addEventListener('input', e => {
-            if(!audioContext) return;
-            switch(e.target.id) {
-                case 'reverb-mix': reverbGain.gain.value = parseFloat(e.target.value); break;
-                case 'delay-time': delay.delayTime.value = parseFloat(e.target.value); break;
-                case 'delay-feedback': feedback.gain.value = parseFloat(e.target.value); break;
+    SynthApp.prototype.saveSong = function() {
+        const songData = {
+            tempo: this.tempo, sequencerData: this.sequencerData, sequencerStepParams: this.sequencerStepParams,
+            synthParams: this.getGlobalSynthParams(),
+            effects: {
+                reverb: parseFloat(this.shadowRoot.getElementById('reverb-mix').value),
+                delayTime: parseFloat(this.shadowRoot.getElementById('delay-time').value),
+                delayFeedback: parseFloat(this.shadowRoot.getElementById('delay-feedback').value),
+                eq: Array.from(this.shadowRoot.querySelectorAll('.eq-gain')).map(s => parseFloat(s.value))
             }
-            if(e.target.classList.contains('eq-gain')) {
-                const index = Array.from(document.querySelectorAll('.eq-gain')).indexOf(e.target);
-                if (eqBands[index]) eqBands[index].gain.value = parseFloat(e.target.value);
-            }
-        });
-    });
-
-    document.getElementById('loadScl').addEventListener('click', () => document.getElementById('tuningFile').click());
-    document.getElementById('tuningFile').addEventListener('change', (event) => {
-        const file = event.target.files[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try { parseScl(e.target.result); document.getElementById('tuningName').textContent = file.name; }
-            catch (err) { alert('Error parsing .scl file: ' + err.message); console.error(err); }
         };
-        reader.readAsText(file);
-    });
+        const blob = new Blob([JSON.stringify(songData, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = 'wc-synth-song.json'; a.click(); URL.revokeObjectURL(a.href);
+    }
 
-    function parseScl(sclData) {
+    SynthApp.prototype.loadSong = function(songData) {
+        this.tempo = songData.tempo; this.shadowRoot.getElementById('tempo').value = this.tempo;
+        this.shadowRoot.getElementById('tempoValue').textContent = this.tempo;
+        this.sequencerData = songData.sequencerData;
+        this.sequencerStepParams = songData.sequencerStepParams || Array(16).fill(null);
+        this.applyGlobalSynthParams(songData.synthParams);
+
+        this.shadowRoot.getElementById('reverb-mix').value = songData.effects.reverb;
+        this.shadowRoot.getElementById('delay-time').value = songData.effects.delayTime;
+        this.shadowRoot.getElementById('delay-feedback').value = songData.effects.delayFeedback;
+        this.shadowRoot.querySelectorAll('.eq-gain').forEach((s, i) => s.value = songData.effects.eq[i]);
+
+        this.shadowRoot.querySelectorAll('input[type="range"], select').forEach(el => el.dispatchEvent(new Event('input')));
+        this.renderSequencerState(); alert('Song loaded successfully!');
+    }
+
+    SynthApp.prototype.parseScl = function(sclData, fileName) {
         const lines = sclData.split('\n').map(l => l.trim()).filter(l => !l.startsWith('!') && l);
         const noteCount = parseInt(lines[1], 10); const newRatios = [1];
         for (let i = 2; i < lines.length; i++) {
@@ -561,61 +603,26 @@ document.addEventListener('DOMContentLoaded', () => {
             newRatios.push(ratio);
         }
         const period = newRatios.find(r => r >= 2) || 2;
-        scaleRatios = Array(128).fill(0).map((_, i) => {
-            const midiNote = i - baseMidiNote; const octave = Math.floor(midiNote / noteCount);
+        this.scaleRatios = Array(128).fill(0).map((_, i) => {
+            const midiNote = i - this.baseMidiNote; const octave = Math.floor(midiNote / noteCount);
             const noteInScale = midiNote % noteCount;
             return Math.pow(period, octave) * newRatios[noteInScale < 0 ? noteInScale + noteCount : noteInScale];
         });
+        this.shadowRoot.getElementById('tuningName').textContent = fileName;
     }
 
-    document.getElementById('saveSong').addEventListener('click', saveSong);
-    document.getElementById('loadSong').addEventListener('click', () => document.getElementById('loadSongInput').click());
-    document.getElementById('loadSongInput').addEventListener('change', (event) => {
+    SynthApp.prototype.handleFileLoad = function(event, callback, fileName = '') {
         const file = event.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            try { loadSong(JSON.parse(e.target.result)); }
-            catch (err) { alert('Error loading song file.'); console.error(err); }
+            try { callback(fileName.endsWith('.json') ? JSON.parse(e.target.result) : e.target.result, fileName); }
+            catch (err) { alert('Error loading file.'); console.error(err); }
         };
         reader.readAsText(file);
-    });
-
-    function saveSong() {
-        const songData = {
-            tempo: tempo, sequencerData: sequencerData, sequencerStepParams: sequencerStepParams,
-            synthParams: getGlobalSynthParams(),
-            effects: {
-                reverb: parseFloat(document.getElementById('reverb-mix').value),
-                delayTime: parseFloat(document.getElementById('delay-time').value),
-                delayFeedback: parseFloat(document.getElementById('delay-feedback').value),
-                eq: Array.from(document.querySelectorAll('.eq-gain')).map(s => parseFloat(s.value))
-            }
-        };
-        const blob = new Blob([JSON.stringify(songData, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = 'responsive-synth-song.json'; a.click(); URL.revokeObjectURL(a.href);
+        event.target.value = ''; // Reset input
     }
-
-    function loadSong(songData) {
-        tempo = songData.tempo; tempoSlider.value = tempo; tempoValue.textContent = tempo;
-        sequencerData.forEach((d, i) => sequencerData[i] = d);
-        if(songData.sequencerStepParams) {
-             songData.sequencerStepParams.forEach((p, i) => sequencerStepParams[i] = p);
-        }
-        applyGlobalSynthParams(songData.synthParams);
-
-        document.getElementById('reverb-mix').value = songData.effects.reverb;
-        document.getElementById('delay-time').value = songData.effects.delayTime;
-        document.getElementById('delay-feedback').value = songData.effects.delayFeedback;
-        document.querySelectorAll('.eq-gain').forEach((s, i) => s.value = songData.effects.eq[i]);
-
-        document.querySelectorAll('input[type="range"], select').forEach(el => el.dispatchEvent(new Event('input')));
-        renderSequencerState(); alert('Song loaded successfully!');
-    }
-
-    setupUI();
-    renderSequencerState(); // Initial render
-});
+}
+customElements.define('synth-app', SynthApp);
 </script>
 
 </body>
