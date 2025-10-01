@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fully Responsive Web Synthesizer</title>
+    <title>My Synth Virtual Analog</title>
     <style>
         :root {
             --bg-color: #282c34;
@@ -64,7 +64,7 @@
             transition: background-color 0.2s;
         }
         button:hover { background-color: #529bde; }
-        
+
         /* --- Sequencer CSS --- */
         .sequencer-grid {
             display: grid;
@@ -147,7 +147,7 @@
 <body>
 
 <div class="synth-container">
-    <h2>Fully Responsive Web Synthesizer</h2>
+    <h2>My Synth</h2>
 
     <div class="control-group">
         <div class="control-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
@@ -170,7 +170,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="control-group">
         <h3>SYNTHESIZER</h3>
         <div class="control-grid">
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reverbGain = audioContext.createGain();
         reverbGain.gain.value = parseFloat(document.getElementById('reverb-mix').value);
         lastNode.connect(convolver); convolver.connect(reverbGain); reverbGain.connect(audioContext.destination);
-        lastNode.connect(audioContext.destination); 
+        lastNode.connect(audioContext.destination);
 
         createReverbImpulseResponse();
         console.log("Audio Context Initialized");
@@ -287,13 +287,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         convolver.buffer = impulse;
     }
-    
+
     // --- Synthesizer Voice Class ---
     class Voice {
         constructor(note) {
             this.note = note;
             this.gate = false;
-            
+
             this.osc = audioContext.createOscillator();
             this.filter = audioContext.createBiquadFilter();
             this.vca = audioContext.createGain();
@@ -305,11 +305,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this.pitchLFO.connect(this.pitchLFOGain); this.pitchLFOGain.connect(this.osc.detune);
             this.cutoffLFO.connect(this.cutoffLFOGain); this.cutoffLFOGain.connect(this.filter.frequency);
             this.osc.connect(this.filter); this.filter.connect(this.vca); this.vca.connect(mainGain);
-            
+
             this.vca.gain.value = 0;
             this.osc.frequency.value = getFrequencyForNote(note);
             this.filter.type = 'lowpass';
-            
+
             this.applyParams(getGlobalSynthParams());
 
             this.osc.start(); this.pitchLFO.start(); this.cutoffLFO.start();
@@ -331,11 +331,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const now = audioContext.currentTime;
             const releaseTime = parseFloat(document.getElementById('env-release').value);
             this.vca.gain.cancelScheduledValues(now);
-            this.vca.gain.setValueAtTime(this.vca.gain.value, now); 
+            this.vca.gain.setValueAtTime(this.vca.gain.value, now);
             this.vca.gain.linearRampToValueAtTime(0, now + releaseTime);
             setTimeout(() => this.disconnect(), (releaseTime * 1000) + 50);
         }
-        
+
         applyParams(params) {
             this.osc.type = params.waveform;
             this.filter.frequency.setTargetAtTime(params.cutoff, audioContext.currentTime, 0.01);
@@ -352,12 +352,12 @@ document.addEventListener('DOMContentLoaded', () => {
             this.pitchLFO.disconnect(); this.cutoffLFO.disconnect();
         }
     }
-    
+
     function getFrequencyForNote(note) {
         if (note < 0 || note > 127) return 0;
         return baseFrequency * scaleRatios[note];
     }
-    
+
     // --- Sequencer Logic ---
     function scheduler() {
         while (nextStepTime < audioContext.currentTime + 0.1) {
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         setTimeout(() => updateSequencerUI(stepIndex), (time - audioContext.currentTime) * 1000);
     }
-    
+
     function playSequencerNoteAtTime(note, time, params) {
         const voice = new Voice(note);
         voice.applyParams(params);
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => voice.disconnect(), (noteEndTime + release - audioContext.currentTime) * 1000 + 50);
     }
-    
+
     function startSequencer() {
         if (isPlaying) return;
         if (!audioContext) initAudio();
@@ -426,16 +426,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             slider.addEventListener('input', handleSliderChange);
             stepButton.addEventListener('click', handleStepClick);
-            
+
             container.appendChild(slider);
             container.appendChild(stepButton);
             sequencerGrid.appendChild(container);
         }
     }
-    
+
     function handleStepClick(event) {
         const index = parseInt(event.target.dataset.index);
-        
+
         if (event.shiftKey) {
             sequencerStepParams[index] = sequencerStepParams[index] ? null : getGlobalSynthParams();
         } else {
@@ -455,19 +455,19 @@ document.addEventListener('DOMContentLoaded', () => {
             sequencerData[index] = parseInt(event.target.value, 10);
         }
     }
-    
+
     function updateSequencerUI(currentPlayingStep) {
         document.querySelectorAll('.seq-step').forEach((step, i) => {
             step.classList.toggle('current', i === currentPlayingStep);
         });
     }
-    
+
     function renderSequencerState() {
         for(let i=0; i<16; i++) {
             const container = sequencerGrid.children[i];
             const slider = container.querySelector('.pitch-slider');
             const stepButton = container.querySelector('.seq-step');
-            
+
             const stepIsActive = sequencerData[i] !== null;
             stepButton.classList.toggle('active', stepIsActive);
             slider.disabled = !stepIsActive;
@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startStopBtn.addEventListener('click', () => isPlaying ? stopSequencer() : startSequencer());
     tempoSlider.addEventListener('input', (e) => { tempo = parseFloat(e.target.value); tempoValue.textContent = tempo; });
-    
+
     // --- Parameter & State Management ---
     function getGlobalSynthParams() {
         return {
@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     }
-    
+
     function applyGlobalSynthParams(params) {
         document.getElementById('osc-waveform').value = params.waveform;
         document.getElementById('filter-cutoff').value = params.cutoff;
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = event.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            try { parseScl(e.target.result); document.getElementById('tuningName').textContent = file.name; } 
+            try { parseScl(e.target.result); document.getElementById('tuningName').textContent = file.name; }
             catch (err) { alert('Error parsing .scl file: ' + err.message); console.error(err); }
         };
         reader.readAsText(file);
@@ -555,8 +555,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const noteCount = parseInt(lines[1], 10); const newRatios = [1];
         for (let i = 2; i < lines.length; i++) {
             let ratio;
-            if (lines[i].includes('.')) { ratio = Math.pow(2, parseFloat(lines[i]) / 1200); } 
-            else if (lines[i].includes('/')) { const [num, den] = lines[i].split('/'); ratio = parseFloat(num) / parseFloat(den); } 
+            if (lines[i].includes('.')) { ratio = Math.pow(2, parseFloat(lines[i]) / 1200); }
+            else if (lines[i].includes('/')) { const [num, den] = lines[i].split('/'); ratio = parseFloat(num) / parseFloat(den); }
             else { ratio = parseInt(lines[i], 10); if (ratio > 0) ratio = Math.pow(2, ratio / 1200);}
             newRatios.push(ratio);
         }
@@ -567,14 +567,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return Math.pow(period, octave) * newRatios[noteInScale < 0 ? noteInScale + noteCount : noteInScale];
         });
     }
-    
+
     document.getElementById('saveSong').addEventListener('click', saveSong);
     document.getElementById('loadSong').addEventListener('click', () => document.getElementById('loadSongInput').click());
     document.getElementById('loadSongInput').addEventListener('change', (event) => {
         const file = event.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            try { loadSong(JSON.parse(e.target.result)); } 
+            try { loadSong(JSON.parse(e.target.result)); }
             catch (err) { alert('Error loading song file.'); console.error(err); }
         };
         reader.readAsText(file);
@@ -595,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
         a.download = 'responsive-synth-song.json'; a.click(); URL.revokeObjectURL(a.href);
     }
-    
+
     function loadSong(songData) {
         tempo = songData.tempo; tempoSlider.value = tempo; tempoValue.textContent = tempo;
         sequencerData.forEach((d, i) => sequencerData[i] = d);
@@ -603,12 +603,12 @@ document.addEventListener('DOMContentLoaded', () => {
              songData.sequencerStepParams.forEach((p, i) => sequencerStepParams[i] = p);
         }
         applyGlobalSynthParams(songData.synthParams);
-        
+
         document.getElementById('reverb-mix').value = songData.effects.reverb;
         document.getElementById('delay-time').value = songData.effects.delayTime;
         document.getElementById('delay-feedback').value = songData.effects.delayFeedback;
         document.querySelectorAll('.eq-gain').forEach((s, i) => s.value = songData.effects.eq[i]);
-        
+
         document.querySelectorAll('input[type="range"], select').forEach(el => el.dispatchEvent(new Event('input')));
         renderSequencerState(); alert('Song loaded successfully!');
     }
