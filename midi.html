@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-Step Web Synthesizer (Pointer Events)</title>
+    <style>
+        :root {
+            --bg-color: #282c34;
+            --text-color: #abb2bf;
+            --control-bg: #444b58;
+            --accent-color: #61afef;
+            --led-off: #3a3f4b;
+            --led-on: #c678dd;
+            --led-active: #98c379;
+        }
+        html { box-sizing: border-box; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+        }
+        .synth-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--control-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        h2, h3, h4 { margin: 0; text-align: center; }
+        h2 { color: var(--accent-color); border-bottom: 1px solid #555; padding-bottom: 10px; }
+        h4 { margin-bottom:10px; margin-top:20px; }
+        .control-group { background: #333944; padding: 15px; border-radius: 8px; }
+        .control-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 20px; }
+        .control { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        label { font-size: 0.9em; }
+        input[type="range"] { max-width: 120px; }
+        button, input[type="file"], select {
+            background-color: var(--accent-color); color: white; border: none; padding: 8px 12px;
+            border-radius: 5px; cursor: pointer; transition: background-color 0.2s; -webkit-appearance: none;
+        }
+        button:hover, select:hover { background-color: #529bde; }
+        button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.7; }
+        #tuningName, #midi-status { font-size: 0.8em; }
+        .sequencer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 10px; align-items: end; }
+        .seq-step-container { display: flex; flex-direction: column; align-items: center; gap: 5px; user-select: none; }
+        .pitch-slider { writing-mode: vertical-lr; direction: rtl; width: 20px; height: 100px; padding: 0; margin: 0; }
+        .pitch-slider:disabled { opacity: 0.5; }
+        .step-button { width: 100%; height: 40px; background-color: var(--led-off); border-radius: 6px; cursor: pointer; position: relative; transition: background-color 0.1s; touch-action: none; }
+        .step-button.active { background-color: var(--led-on); }
+        .step-button.current::after { content: ''; position: absolute; top: -4px; right: -4px; bottom: -4px; left: -4px; border: 2px solid var(--led-active); border-radius: 8px; }
+        .has-data { position: absolute; top: 4px; left: 4px; width: 8px; height: 8px; background-color: var(--accent-color); border-radius: 50%; display: none; }
+        .has-data.visible { display: block; }
+        @media (max-width: 600px) { .synth-container { padding: 15px; gap: 15px; } .control-grid, .sequencer-grid { gap: 8px; } h2 { font-size: 1.5em; } h3, h4 { font-size: 1.1em; } label { font-size: 0.85em; } .pitch-slider { height: 80px; } .step-button { height: 35px; } }
+        @media (max-width: 400px) { .synth-container { padding: 10px; } .control-group { padding: 10px; } }
+    </style>
+</head>
+<body>
+
+<div class="synth-container">
+    <h2>8-Step Web Synthesizer</h2>
+    <div class="control-group">
+        <div class="control-grid">
+            <div class="control"><label>Transport</label><button id="startStopBtn">Start</button><span>Tempo: <span id="tempoValue">120</span></span><input type="range" id="tempo" min="30" max="240" value="120"></div>
+            <div class="control"><label>Master</label><div style="display: flex; gap: 8px;"><button id="saveSong">Save</button><button id="loadSong">Load</button><button id="exportWav">Export WAV</button></div><span>Volume</span><input type="range" id="master-volume" min="0" max="1" value="0.7" step="0.01"><input type="file" id="loadSongInput" accept=".json" style="display:none;"></div>
+            <div class="control"><label>Tuning</label><button id="loadScl">Load .scl</button><span id="tuningName">12-TET</span><input type="file" id="tuningFile" accept=".scl" style="display:none;"></div>
+        </div>
+    </div>
+    <div class="control-group" id="midi-controls" style="display: none;">
+        <h3>MIDI Controller</h3>
+        <div class="control-grid"><div class="control"><label for="midi-inputs">Input Device</label><select id="midi-inputs"><option>None</option></select><button id="midi-toggle" disabled>Enable MIDI</button><span id="midi-status">Disabled</span></div></div>
+    </div>
+    <div class="control-group">
+        <h3>SYNTHESIZER</h3>
+        <div class="control-grid">
+            <div class="control"><label>Waveform</label><select id="osc-waveform"><option value="sawtooth">Saw</option><option value="square">Square</option><option value="triangle">Triangle</option><option value="sine">Sine</option></select></div>
+            <div class="control"><label>Filter Cutoff</label><input type="range" id="filter-cutoff" min="20" max="8000" value="1000" step="1"></div>
+            <div class="control"><label>Filt. Reso</label><input type="range" id="filter-resonance" min="0.1" max="18" value="1" step="0.1"></div>
+            <div class="control"><label>Pitch LFO Rate</label><input type="range" id="pitch-lfo-rate" min="0.1" max="20" value="5" step="0.1"></div>
+            <div class="control"><label>Pitch LFO Depth</label><input type="range" id="pitch-lfo-depth" min="0" max="25" value="0" step="1"></div>
+            <div class="control"><label>Cutoff LFO Rate</label><input type="range" id="cutoff-lfo-rate" min="0.1" max="20" value="2" step="0.1"></div>
+            <div class="control"><label>Cutoff LFO Depth</label><input type="range" id="cutoff-lfo-depth" min="0" max="4000" value="0" step="10"></div>
+        </div>
+        <h4>ADSR Envelope</h4>
+        <div class="control-grid">
+            <div class="control"><label>Attack</label><input type="range" id="env-attack" min="0.01" max="2" value="0.02" step="0.01"></div>
+            <div class="control"><label>Decay</label><input type="range" id="env-decay" min="0.01" max="2" value="0.2" step="0.01"></div>
+            <div class="control"><label>Sustain</label><input type="range" id="env-sustain" min="0" max="1" value="0.8" step="0.01"></div>
+            <div class="control"><label>Release</label><input type="range" id="env-release" min="0.01" max="3" value="0.3" step="0.01"></div>
+        </div>
+    </div>
+    <div class="control-group">
+        <h3>EFFECTS</h3>
+        <div class="control-grid">
+            <div class="control"><label>Reverb</label><input type="range" id="reverb-mix" min="0" max="1" value="0.2" step="0.01"></div>
+            <div class="control"><label>Echo Time</label><input type="range" id="delay-time" min="0" max="1" value="0.25" step="0.01"></div>
+            <div class="control"><label>Echo Feedback</label><input type="range" id="delay-feedback" min="0" max="0.9" value="0.4" step="0.01"></div>
+        </div>
+        <div class="control-grid" style="margin-top: 15px;">
+            <div class="control"><label>EQ Low</label><input type="range" class="eq-gain" data-freq="250" min="-24" max="24" value="0" step="1"></div>
+            <div class="control"><label>EQ Mid</label><input type="range" class="eq-gain" data-freq="1000" min="-24" max="24" value="0" step="1"></div>
+            <div class="control"><label>EQ High</label><input type="range" class="eq-gain" data-freq="4000" min="-24" max="24" value="0" step="1"></div>
+        </div>
+    </div>
+    <div class="control-group">
+        <h3>SEQUENCER</h3>
+        <div id="sequencer" class="sequencer-grid"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let audioContext = null, mainGain = null, isPlaying = false, currentStep = 0, tempo = 120, nextStepTime = 0.0, timerID = null;
+    const baseMidiNote = 60, baseFrequency = 261.626;
+    let scaleRatios = Array.from({ length: 128 }, (_, i) => Math.pow(2, (i - baseMidiNote) / 12));
+    const effects = {}, sequencerData = Array(8).fill(null), sequencerStepParams = Array(8).fill(null), activeVoices = new Map();
+    let midiAccess = null, activeMidiInput = null;
+
+    class Voice {
+        constructor(note, ac, output) {
+            this.ac = ac; this.note = note; this.state = 'idle'; this.disconnectTimeout = null;
+            this.osc = ac.createOscillator(); this.filter = ac.createBiquadFilter(); this.vca = ac.createGain();
+            this.pitchLFO = ac.createOscillator(); this.pitchLFOGain = ac.createGain(); this.cutoffLFO = ac.createOscillator(); this.cutoffLFOGain = ac.createGain();
+            this.pitchLFO.connect(this.pitchLFOGain); this.pitchLFOGain.connect(this.osc.detune);
+            this.cutoffLFO.connect(this.cutoffLFOGain); this.cutoffLFOGain.connect(this.filter.frequency);
+            this.osc.connect(this.filter); this.filter.connect(this.vca); this.vca.connect(output);
+            this.vca.gain.value = 0; this.osc.frequency.value = getFrequencyForNote(note);
+            this.filter.type = 'lowpass'; this.osc.start(); this.pitchLFO.start(); this.cutoffLFO.start();
+        }
+        applyParams(params) {
+            const now = this.ac.currentTime;
+            this.osc.type = params.waveform; this.filter.frequency.setTargetAtTime(params.cutoff, now, 0.01);
+            this.filter.Q.setTargetAtTime(params.resonance, now, 0.01); this.pitchLFO.frequency.setTargetAtTime(params.pitchLfoRate, now, 0.01);
+            this.pitchLFOGain.gain.setTargetAtTime(params.pitchLfoDepth, now, 0.01); this.cutoffLFO.frequency.setTargetAtTime(params.cutoffLfoRate, now, 0.01);
+            this.cutoffLFOGain.gain.setTargetAtTime(params.cutoffLfoDepth, now, 0.01);
+        }
+        triggerAttack(velocity) {
+            if (this.disconnectTimeout) clearTimeout(this.disconnectTimeout);
+            this.state = 'playing'; this.applyParams(getGlobalSynthParams());
+            const now = this.ac.currentTime, adsr = getGlobalSynthParams().adsr, gain = velocity / 127;
+            this.vca.gain.cancelScheduledValues(now); this.vca.gain.setValueAtTime(this.vca.gain.value, now);
+            this.vca.gain.linearRampToValueAtTime(gain, now + adsr.attack);
+            this.vca.gain.linearRampToValueAtTime(adsr.sustain * gain, now + adsr.attack + adsr.decay);
+        }
+        triggerRelease() {
+            if (this.state !== 'playing') return; this.state = 'releasing';
+            const now = this.ac.currentTime, releaseTime = getGlobalSynthParams().adsr.release;
+            this.vca.gain.cancelScheduledValues(now); this.vca.gain.setValueAtTime(this.vca.gain.value, now);
+            this.vca.gain.linearRampToValueAtTime(0, now + releaseTime);
+            this.disconnectTimeout = setTimeout(() => {
+                this.state = 'idle'; activeVoices.delete(this.note); this.disconnect();
+            }, (releaseTime * 1000) + 200);
+        }
+        disconnect() {
+            try {
+                this.vca.gain.cancelScheduledValues(0); this.vca.gain.setValueAtTime(0, 0);
+                this.osc.stop(); this.pitchLFO.stop(); this.cutoffLFO.stop();
+                this.osc.disconnect(); this.filter.disconnect(); this.vca.disconnect();
+                this.pitchLFO.disconnect(); this.pitchLFOGain.disconnect();
+                this.cutoffLFO.disconnect(); this.cutoffLFOGain.disconnect();
+            } catch (e) {}
+        }
+    }
+
+    const s = (id) => document.getElementById(id);
+
+    async function initAudio() {
+        if (audioContext && audioContext.state === 'running') return;
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            mainGain = audioContext.createGain(); let lastNode = mainGain; effects.eqBands = [];
+            document.querySelectorAll('.eq-gain').forEach((el, i) => { const eq = audioContext.createBiquadFilter(); eq.type = ['lowshelf', 'peaking', 'highshelf'][i]; eq.frequency.value = parseFloat(el.dataset.freq); lastNode.connect(eq); lastNode = eq; effects.eqBands.push(eq); });
+            effects.delay = audioContext.createDelay(); effects.feedback = audioContext.createGain(); lastNode.connect(effects.delay); effects.delay.connect(effects.feedback); effects.feedback.connect(effects.delay); lastNode = effects.delay;
+            effects.convolver = audioContext.createConvolver(); effects.reverbGain = audioContext.createGain(); lastNode.connect(effects.convolver); effects.convolver.connect(effects.reverbGain); effects.reverbGain.connect(audioContext.destination); lastNode.connect(audioContext.destination);
+            createReverbImpulseResponse();
+        }
+        if (audioContext.state === 'suspended') { await audioContext.resume(); }
+        s('master-volume').dispatchEvent(new Event('input'));
+    }
+
+    async function playNote(note, velocity = 100) {
+        await initAudio();
+        if (activeVoices.has(note)) {
+            activeVoices.get(note).triggerAttack(velocity);
+        } else {
+            const voice = new Voice(note, audioContext, mainGain);
+            activeVoices.set(note, voice);
+            voice.triggerAttack(velocity);
+        }
+    }
+
+    function stopNote(note) {
+        if (activeVoices.has(note)) {
+            activeVoices.get(note).triggerRelease();
+        }
+    }
+
+    function getFrequencyForNote(note) { return baseFrequency * scaleRatios[note]; }
+
+    function getGlobalSynthParams() {
+        const attack = parseFloat(s('env-attack').value), decay = parseFloat(s('env-decay').value), sustain = parseFloat(s('env-sustain').value), release = parseFloat(s('env-release').value);
+        return {
+            waveform: s('osc-waveform').value, cutoff: parseFloat(s('filter-cutoff').value), resonance: parseFloat(s('filter-resonance').value),
+            pitchLfoRate: parseFloat(s('pitch-lfo-rate').value), pitchLfoDepth: parseFloat(s('pitch-lfo-depth').value),
+            cutoffLfoRate: parseFloat(s('cutoff-lfo-rate').value), cutoffLfoDepth: parseFloat(s('cutoff-lfo-depth').value),
+            adsr: { attack: isNaN(attack) ? 0.01 : attack, decay: isNaN(decay) ? 0.1 : decay, sustain: isNaN(sustain) ? 0.8 : sustain, release: isNaN(release) ? 0.3 : release, }
+        };
+    }
+
+    function setupUI() {
+        const sequencerGrid = s('sequencer');
+        for (let i = 0; i < 8; i++) {
+            const container = document.createElement('div'); container.className = 'seq-step-container';
+            const slider = document.createElement('input'); slider.type = 'range'; slider.className = 'pitch-slider';
+            slider.min = 36; slider.max = 84; slider.value = 60; slider.step = 1; slider.dataset.index = i;
+            const button = document.createElement('div'); button.className = 'step-button'; button.dataset.index = i;
+            const hasData = document.createElement('div'); hasData.className = 'has-data';
+            button.appendChild(hasData); container.appendChild(slider); container.appendChild(button);
+            sequencerGrid.appendChild(container);
+
+            button.addEventListener('click', e => {
+                e.preventDefault();
+                if (e.shiftKey) { sequencerStepParams[i] = sequencerStepParams[i] ? null : getGlobalSynthParams(); }
+                else { sequencerData[i] = sequencerData[i] === null ? parseInt(slider.value) : null; }
+                renderSequencerState();
+            });
+            button.addEventListener('pointerdown', e => {
+                button.setPointerCapture(e.pointerId);
+                playNote(parseInt(slider.value));
+            });
+            button.addEventListener('pointerup', e => {
+                button.releasePointerCapture(e.pointerId);
+                stopNote(parseInt(slider.value));
+            });
+            button.addEventListener('pointerleave', e => {
+                if (e.buttons === 1) { // Only stop if mouse button is still pressed
+                    stopNote(parseInt(slider.value));
+                }
+            });
+            slider.addEventListener('input', () => { if (sequencerData[i] !== null) sequencerData[i] = parseInt(slider.value); });
+        }
+    }
+
+    function renderSequencerState() { for(let i = 0; i < 8; i++) { const container = s('sequencer').children[i], slider = container.querySelector('.pitch-slider'), button = container.querySelector('.step-button'), hasData = container.querySelector('.has-data'), isActive = sequencerData[i] !== null; button.classList.toggle('active', isActive); slider.disabled = !isActive; hasData.classList.toggle('visible', sequencerStepParams[i] !== null); if(isActive) slider.value = sequencerData[i]; } }
+    function updateSequencerUI(currentPlayingStep) { for(let i = 0; i < 8; i++) { s('sequencer').children[i].querySelector('.step-button').classList.toggle('current', i === currentPlayingStep); } }
+
+    async function startSequencer() {
+        if (isPlaying) { stopSequencer(); return; }
+        await initAudio();
+        isPlaying = true; currentStep = 0; nextStepTime = audioContext.currentTime;
+        scheduler(); s('startStopBtn').textContent = 'Stop';
+    }
+    function stopSequencer() { isPlaying = false; window.clearTimeout(timerID); s('startStopBtn').textContent = 'Start'; updateSequencerUI(-1); }
+    function scheduler() {
+        if (!isPlaying) return;
+        while (nextStepTime < audioContext.currentTime + 0.1) {
+            scheduleStep(currentStep, nextStepTime);
+            nextStepTime += (60.0 / tempo) / 4;
+            currentStep = (currentStep + 1) % 8;
+        }
+        timerID = window.setTimeout(scheduler, 25.0);
+    }
+    function scheduleStep(stepIndex, time) {
+        const note = sequencerData[stepIndex];
+        if (note !== null) {
+            const params = sequencerStepParams[stepIndex] || getGlobalSynthParams();
+            playSequencerNoteAtTime(note, time, params);
+        }
+        setTimeout(() => updateSequencerUI(stepIndex), (time - audioContext.currentTime) * 1000);
+    }
+    function playSequencerNoteAtTime(note, time, params, context, mainOutput) {
+        const voice = new Voice(note, context || audioContext, mainOutput || mainGain);
+        voice.applyParams(params);
+        const noteDuration = (60.0/tempo)/4*0.95, noteEndTime = time + noteDuration, {attack, decay, sustain, release} = params.adsr;
+        voice.vca.gain.setValueAtTime(0, time);
+        voice.vca.gain.linearRampToValueAtTime(1.0, time + attack);
+        voice.vca.gain.linearRampToValueAtTime(sustain, time + attack + decay);
+        voice.vca.gain.setValueAtTime(sustain, noteEndTime);
+        voice.vca.gain.linearRampToValueAtTime(0, noteEndTime + release);
+        if (!context) { const totalDurationMs = (time - audioContext.currentTime + noteDuration + release)*1000 + 200; if (totalDurationMs > 0) setTimeout(() => voice.disconnect(), totalDurationMs); }
+    }
+
+    function initMidi() { if (!navigator.requestMIDIAccess) return; s('midi-controls').style.display = 'block'; const btn = s('midi-toggle'); navigator.requestMIDIAccess().then(a => { midiAccess = a; populateMidiInputs(); a.onstatechange = () => populateMidiInputs(); btn.addEventListener('click', () => toggleMidi()); }).catch(err => { console.error(err); s('midi-status').textContent = 'MIDI Failed'; }); }
+    function populateMidiInputs() { const selector = s('midi-inputs'), btn = s('midi-toggle'); selector.innerHTML = ''; if (midiAccess.inputs.size > 0) { for (const input of midiAccess.inputs.values()) { const opt = document.createElement('option'); opt.value = input.id; opt.textContent = input.name; selector.appendChild(opt); } btn.disabled = false; } else { selector.innerHTML = '<option>No devices found</option>'; btn.disabled = true; } }
+    async function toggleMidi() { const btn = s('midi-toggle'), status = s('midi-status'), selector = s('midi-inputs'); if (activeMidiInput) { activeMidiInput.onmidimessage = null; activeMidiInput = null; btn.textContent = 'Enable MIDI'; status.textContent = 'Disabled'; selector.disabled = false; } else { const input = midiAccess.inputs.get(selector.value); if (input) { await initAudio(); activeMidiInput = input; input.onmidimessage = handleMidiMessage; btn.textContent = 'Disable MIDI'; status.textContent = `Connected: ${input.name}`; selector.disabled = true; } } }
+    function handleMidiMessage(event) { const cmd=event.data[0]>>4,note=event.data[1],vel=event.data.length>2?event.data[2]:100; if(cmd===9&&vel>0){playNote(note,vel);}else if(cmd===8||(cmd===9&&vel===0)){stopNote(note);}}
+    async function exportToWav() { await initAudio(); const btn = s('exportWav'); btn.textContent = 'Rendering...'; btn.disabled = true; const DURATION = 8*(60.0/tempo)/4, RATE = audioContext.sampleRate, offlineCtx = new OfflineAudioContext(2, Math.ceil(DURATION * RATE), RATE); const gain = offlineCtx.createGain(); gain.gain.value = parseFloat(s('master-volume').value); gain.connect(offlineCtx.destination); for (let i=0;i<8;i++){const note = sequencerData[i]; if (note!==null){const time=i*(60.0/tempo)/4; const params=sequencerStepParams[i]||getGlobalSynthParams(); playSequencerNoteAtTime(note,time,params,offlineCtx,gain);}} try { const buffer = await offlineCtx.startRendering(), blob = bufferToWav(buffer), url = URL.createObjectURL(blob); const a = document.createElement('a'); a.style.display = 'none'; a.href = url; a.download = `synth-sequence-${tempo}bpm.wav`; document.body.appendChild(a); a.click(); URL.revokeObjectURL(url); a.remove(); } catch (err) { console.error(err); alert('Failed to export WAV file.'); } finally { btn.textContent = 'Export WAV'; btn.disabled = false; } }
+    function bufferToWav(buffer) { const numChan=buffer.numberOfChannels,len=buffer.length*numChan*2+44,arr=new ArrayBuffer(len),view=new DataView(arr),chans=[];let pos=0;const setU16=d=>{view.setUint16(pos,d,true);pos+=2;},setU32=d=>{view.setUint32(pos,d,true);pos+=4;}; setU32(0x46464952);setU32(len-8);setU32(0x45564157);setU32(0x20746d66);setU32(16);setU16(1);setU16(numChan);setU32(buffer.sampleRate);setU32(buffer.sampleRate*2*numChan);setU16(numChan*2);setU16(16);setU32(0x61746164);setU32(len-pos-4); for(let i=0;i<numChan;i++)chans.push(buffer.getChannelData(i)); for(let i=0;i<buffer.length;i++){for(let j=0;j<numChan;j++){let s=Math.max(-1,Math.min(1,chans[j][i])); s=s<0?s*32768:s*32767; view.setInt16(pos,s,true);pos+=2;}} return new Blob([view],{type:'audio/wav'}); }
+    function applyGlobalSynthParams(p) { s('osc-waveform').value=p.waveform;s('filter-cutoff').value=p.cutoff;s('filter-resonance').value=p.resonance;s('pitch-lfo-rate').value=p.pitchLfoRate;s('pitch-lfo-depth').value=p.pitchLfoDepth;s('cutoff-lfo-rate').value=p.cutoffLfoRate;s('cutoff-lfo-depth').value=p.cutoffLfoDepth;s('env-attack').value=p.adsr.attack;s('env-decay').value=p.adsr.decay;s('env-sustain').value=p.adsr.sustain;s('env-release').value=p.adsr.release;}
+    function handleFileLoad(event, callback, fileName = '') { const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const d=fileName.endsWith('.json')||fileName===''?JSON.parse(e.target.result):e.target.result;callback(d,fileName);}catch(err){alert('Error: '+err.message);console.error(err);}};reader.readAsText(file);event.target.value='';}
+    function loadSong(d) { tempo=d.tempo;s('tempo').value=tempo;s('tempoValue').textContent=tempo;d.sequencerData.forEach((val,i)=>sequencerData[i]=val);(d.sequencerStepParams||[]).forEach((val,i)=>sequencerStepParams[i]=val);applyGlobalSynthParams(d.synthParams);s('reverb-mix').value=d.effects.reverb;s('delay-time').value=d.effects.delayTime;s('delay-feedback').value=d.effects.feedback;document.querySelectorAll('.eq-gain').forEach((el,i)=>el.value=d.effects.eq[i]);document.querySelectorAll('input[type="range"],select').forEach(el=>el.dispatchEvent(new Event('input')));renderSequencerState();alert('Song loaded!');}
+    function saveSong() { const d={tempo,sequencerData,sequencerStepParams,synthParams:getGlobalSynthParams(),effects:{reverb:parseFloat(s('reverb-mix').value),delayTime:parseFloat(s('delay-time').value),delayFeedback:parseFloat(s('delay-feedback').value),eq:Array.from(document.querySelectorAll('.eq-gain')).map(el=>parseFloat(el.value))}};const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='8step-synth-song.json';a.click();URL.revokeObjectURL(a.href);}
+    function parseScl(sclData, fileName) { try { const lines=sclData.split('\n').map(l=>l.trim()).filter(l=>!l.startsWith('!')&&l),count=parseInt(lines[1]),ratios=[1];for(let i=2;i<lines.length;i++){let r;if(lines[i].includes('.'))r=Math.pow(2,parseFloat(lines[i])/1200);else if(lines[i].includes('/')){const[n,d]=lines[i].split('/');r=parseFloat(n)/parseFloat(d);}else{r=parseInt(lines[i]);if(r>0)r=Math.pow(2,r/1200);}ratios.push(r);}const period=ratios.find(r=>r>=2)||2;scaleRatios=Array(128).fill(0).map((_,i)=>{const m=i-baseMidiNote,o=Math.floor(m/count),n=m%count;return Math.pow(period,o)*ratios[n<0?n+count:n];});s('tuningName').textContent=fileName;}catch(e){alert("Error parsing Scala file.");console.error(e);}}
+    function createReverbImpulseResponse() { if(!audioContext)return;const r=audioContext.sampleRate,l=r*2,imp=audioContext.createBuffer(2,l,r);for(let i=0;i<l;i++){imp.getChannelData(0)[i]=(Math.random()*2-1)*Math.pow(1-i/l,2.5);imp.getChannelData(1)[i]=(Math.random()*2-1)*Math.pow(1-i/l,2.5);}effects.convolver.buffer=imp;}
+
+    // --- Initial Execution ---
+    setupUI();
+    initMidi();
+});
+</script>
+</body>
+</html>
