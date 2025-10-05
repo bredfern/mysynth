@@ -308,7 +308,9 @@ class SynthApp extends HTMLElement {
     }
 
     onMIDISuccess(midiAccess) {
-        this.shadowRoot.getElementById('midi-controls').removeAttribute('disabled');
+        if (this.shadowRoot.getElementById('midi-controls') !== null || undefined) {
+            this.shadowRoot.getElementById('midi-controls').removeAttribute('disabled');
+        }
         this.populateMIDIInputs(midiAccess);
         midiAccess.onstatechange = () => this.populateMIDIInputs(midiAccess);
     }
