@@ -11,7 +11,7 @@ const urlsToCache = [
   "/mysynth/synth-app.css",
   "/mysynth/android-chrome-192x192.png",
   "/mysynth/android-chrome-512x512.png",
-  "/mysynth/apple-touch-icon.png"
+  "/mysynth/apple-touch-icon.png",
   "/mysynth/favicon-16x16.png",
   "/mysynth/favicon-32x32.png",
   "/mysynth/favicon.ico",
