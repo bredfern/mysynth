@@ -9,11 +9,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" href="/icon.png">
+    <link rel="apple-touch-icon" href="/icon.png">
     <title>My Synthesizer</title>
     <style>
-        @import url(root.css);
+        @import url(src/root.css);
     </style>
 </head>
 
@@ -23,7 +23,7 @@
 
     <template id="sequencer-step-template">
         <style>
-            @import url(seq-step.css);
+            @import url(src/seq-step.css);
         </style>
         <input type="range" class="pitch-slider" min="36" max="84" value="60" step="1">
         <div class="step-button">
@@ -33,7 +33,7 @@
 
     <template id="synth-app-template">
         <style>
-            @import url(synth-app.css);
+            @import url(src/synth-app.css);
         </style>
 
         <h1>🎹 My Synthesizer</h1>
@@ -154,9 +154,9 @@
         </div>
     </template>
 
-    <script src="synth.js" defer></script>
+    <script type="module" src="src/synth.js" defer></script>
     <script>
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('src/sw.js');
     </script>
 </body>
 
