@@ -23,7 +23,7 @@
   "theme_color":"#ffffff",
   "background_color":"#ffffff",
   "display":"standalone",
-  "start_url": "/mysynth/public",
+  "start_url": "/mysynth/",
   "display": "fullscreen",
   "theme_color": "#B12A34",
   "background_color": "#B12A34"
