@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circular HTML5 Range Slider</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #f0f0f0;
+    }
+
+    .circular-slider {
+        position: relative;
+        width: 200px;
+        height: 200px;
+    }
+
+    /* Hide the default range slider */
+    .circular-slider input[type="range"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        z-index: 2;
+        cursor: pointer;
+    }
+
+    /* Circular track */
+    .circle {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(#4caf50 var(--angle, 0deg), #ddd 0deg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    /* Value display */
+    .value {
+        position: absolute;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+</style>
+</head>
+<body>
+
+<div class="circular-slider">
+    <input type="range" min="0" max="100" value="0" step="1">
+    <div class="circle">
+        <div class="value">0%</div>
+    </div>
+</div>
+
+<script>
+    const range = document.querySelector('.circular-slider input');
+    const circle = document.querySelector('.circle');
+    const valueDisplay = document.querySelector('.value');
+
+    function updateSlider() {
+        const val = parseInt(range.value, 10);
+        const angle = (val / range.max) * 360;
+        circle.style.setProperty('--angle', `${angle}deg`);
+        valueDisplay.textContent = `${val}%`;
+    }
+
+    range.addEventListener('input', updateSlider);
+    updateSlider(); // Initialize
+</script>
+
+</body>
+</html>
